@@ -33,14 +33,14 @@ extern "C" char hair_msnn_ptx[];
 
 struct RenderWindow_HairMSNN : public owl::viewer::OWLViewer
 {
-    RenderWindow_HairMSNN(Scene& scene, vec2i resolution, bool interactive);
+    RenderWindow_HairMSNN(Scene &scene, vec2i resolution, bool interactive);
 
     void initialize();
 
     vec3f getSceneCg();
 
     void fetchSceneSamples();
-    
+
     void resetNetwork();
     void setNRCTrain(bool train);
 
@@ -57,38 +57,38 @@ struct RenderWindow_HairMSNN : public owl::viewer::OWLViewer
     // /*! window notifies us that we got resized. We HAVE to override
     //     this to know our actual render dimensions, and get pointer
     //     to the device frame buffer that the viewer cated for us */
-    void resize(const vec2i& newSize) override;
+    void resize(const vec2i &newSize) override;
 
     // /*! this function gets called whenever any camera manipulator
     //   updates the camera. gets called AFTER all values have been updated */
     void cameraChanged() override;
 
-    void customKey(char key, const vec2i& pos) override;
+    void customKey(char key, const vec2i &pos) override;
     void screenShotEXR(std::string fname);
 
     void uploadLights();
 
-    OWLContext context{ 0 };
-    OWLModule module{ 0 };
+    OWLContext context{0};
+    OWLModule module{0};
 
     bool sbtDirty = true;
     bool progressive = false;
 
-    OWLRayGen rayGen{ 0 };
-    OWLMissProg missProg{ 0 };
+    OWLRayGen rayGen{0};
+    OWLMissProg missProg{0};
 
     OWLGroup world, bvhSurfaces;
 
     Scene currentScene;
     OWLParams launchParams;
 
-    float4* ptAccumBuffer;
-    float4* nnAccumBuffer;
-    float4* finalAccumBuffer;
-         
-    float4* ptAverageBuffer;
-    float4* nnAverageBuffer;
-    float4* finalAverageBuffer;
+    float4 *ptAccumBuffer;
+    float4 *nnAccumBuffer;
+    float4 *finalAccumBuffer;
+
+    float4 *ptAverageBuffer;
+    float4 *nnAverageBuffer;
+    float4 *finalAverageBuffer;
 
     // Properties about the scene
     vec3f maxBound = vec3f(1e-30f), minBound = vec3f(1e30f);
@@ -114,11 +114,11 @@ struct RenderWindow_HairMSNN : public owl::viewer::OWLViewer
     int beta = 0;
 
     // NRC
-    OWLBuffer sampledPointsBuf{ 0 }, sampledSurfaceVectorBuf{ 0 }, sampledParamsBuf{ 0 };
-    OWLBuffer sceneIndicesBuf{ 0 };
+    OWLBuffer sampledPointsBuf{0}, sampledSurfaceVectorBuf{0}, sampledParamsBuf{0};
+    OWLBuffer sceneIndicesBuf{0};
 
-    OWLBuffer omegaSamplesBuf{ 0 };
-    OWLBuffer omegaIndicesBuf{ 0 };
+    OWLBuffer omegaSamplesBuf{0};
+    OWLBuffer omegaIndicesBuf{0};
 
     std::vector<vec3f> sampledPoints;
     std::vector<vec4f> sampledSurfaceVector, sampledParams;
@@ -130,19 +130,22 @@ struct RenderWindow_HairMSNN : public owl::viewer::OWLViewer
     int numSamples = 1000000;
     int everyNth = 0;
 
-    OWLBuffer trainIdxs{ 0 };
+    OWLBuffer trainIdxs{0};
 
     bool showCache = false;
     bool saveComponents = false;
 
-    OWLBuffer nnFrameInput{ 0 }, nnFrameOutput{ 0 };
-    OWLBuffer nnTrainInput{ 0 }, nnTrainOutput{ 0 };
+    bool showpt{true};
+    bool shownn{true};
 
-    OWLBuffer gBuffer{ 0 };
+    OWLBuffer nnFrameInput{0}, nnFrameOutput{0};
+    OWLBuffer nnTrainInput{0}, nnTrainOutput{0};
 
-    TINY_MLP* mlp;
+    OWLBuffer gBuffer{0};
+
+    TINY_MLP *mlp;
     float trainingLoss = 0.f;
-    int mlpInputCh = 12, mlpOutputCh = 3;
+    int mlpInputCh = 9, mlpOutputCh = 3;
 
     float trainTime = 0.f, inferTime = 0.f, renderTime = 0.f;
 };

@@ -65,6 +65,9 @@ struct Scene {
 	bool equalTime = false;
 	float time = 0.f;
 
+    bool hasHairColorTexture{false};
+    Texture hairColorTexture;
+
 	// Dual scattering precomputation path
 	std::string dualScatterPrecompPath = "";
 

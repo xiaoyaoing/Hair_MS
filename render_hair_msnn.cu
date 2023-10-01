@@ -43,57 +43,60 @@ void RenderWindow_HairMSNN::fetchSceneSamples()
 
     // Sample Hair
     float totalCurveLength = this->totalSegmentsLength;
-    for (auto segIdx : this->currentScene.hairModel.segmentIndices) {
+    for (auto segIdx : this->currentScene.hairModel.segmentIndices)
+    {
         float segLength = this->segmentLengths[segIdx];
         int numSegSamples = int(segLength / totalCurveLength * this->numSamples);
         numSegSamples = numSegSamples == 0 ? 1 : numSegSamples;
-    
+
         vec4f controlPoints[4];
         controlPoints[0] = vec4f(this->currentScene.hairModel.controlPoints[segIdx + 0],
-            this->currentScene.hairModel.widths[segIdx + 0]);
+                                 this->currentScene.hairModel.widths[segIdx + 0]);
         controlPoints[1] = vec4f(this->currentScene.hairModel.controlPoints[segIdx + 1],
-            this->currentScene.hairModel.widths[segIdx + 1]);
+                                 this->currentScene.hairModel.widths[segIdx + 1]);
         controlPoints[2] = vec4f(this->currentScene.hairModel.controlPoints[segIdx + 2],
-            this->currentScene.hairModel.widths[segIdx + 2]);
+                                 this->currentScene.hairModel.widths[segIdx + 2]);
         controlPoints[3] = vec4f(this->currentScene.hairModel.controlPoints[segIdx + 3],
-            this->currentScene.hairModel.widths[segIdx + 3]);
-    
+                                 this->currentScene.hairModel.widths[segIdx + 3]);
+
         CubicInterpolator interpolator;
         interpolator.initializeFromCatrom(controlPoints);
-    
-        for (int s = 0; s < numSegSamples; s++) {
+
+        for (int s = 0; s < numSegSamples; s++)
+        {
             float eps1 = std::generate_canonical<float, std::numeric_limits<float>::digits>(generator);
             vec3f point = interpolator.position3(eps1);
             vec3f tangent = curveTangent(interpolator, eps1);
             float radius = interpolator.radius(eps1);
-    
+
             this->sampledPoints.push_back(point);
             this->sampledSurfaceVector.push_back(vec4f(tangent, radius));
             this->sampledParams.push_back(vec4f(0.f));
         }
     }
-    
+
     this->numSamples = this->sampledPoints.size();
 
     // Generate omega buffer
-    for (int i = 0; i < this->numSamples; i++) {
+    for (int i = 0; i < this->numSamples; i++)
+    {
         float eps1 = std::generate_canonical<float, std::numeric_limits<float>::digits>(generator);
         float eps2 = std::generate_canonical<float, std::numeric_limits<float>::digits>(generator);
-    
+
         vec3f omega = uniformSampleSphere(vec2f(eps1, eps2));
         this->omegaSamples.push_back(omega);
     }
 
     // Generate device buffers
     this->omegaSamplesBuf = owlDeviceBufferCreate(context,
-        OWL_FLOAT, this->omegaSamples.size(), this->omegaSamples.data());
+                                                  OWL_FLOAT, this->omegaSamples.size(), this->omegaSamples.data());
 
     this->sampledPointsBuf = owlDeviceBufferCreate(context,
-        OWL_FLOAT3, this->numSamples, this->sampledPoints.data());
+                                                   OWL_FLOAT3, this->numSamples, this->sampledPoints.data());
     this->sampledSurfaceVectorBuf = owlDeviceBufferCreate(context,
-        OWL_FLOAT4, this->numSamples, this->sampledSurfaceVector.data());
+                                                          OWL_FLOAT4, this->numSamples, this->sampledSurfaceVector.data());
     this->sampledParamsBuf = owlDeviceBufferCreate(context,
-        OWL_FLOAT4, this->numSamples, this->sampledParams.data());
+                                                   OWL_FLOAT4, this->numSamples, this->sampledParams.data());
 }
 void RenderWindow_HairMSNN::initialize()
 {
@@ -110,22 +113,22 @@ void RenderWindow_HairMSNN::initialize()
         this->mlp->loadWeights(this->currentScene.nrcWeights);
 
     this->nnFrameInput = owlDeviceBufferCreate(context, OWL_FLOAT,
-        frameSize * this->mlpInputCh, nullptr);
+                                               frameSize * this->mlpInputCh, nullptr);
     this->nnFrameOutput = owlDeviceBufferCreate(context, OWL_FLOAT,
-        frameSize * this->mlpOutputCh, nullptr);
+                                                frameSize * this->mlpOutputCh, nullptr);
 
     this->nnTrainInput = owlDeviceBufferCreate(context, OWL_FLOAT,
-        this->numTrainRecords * this->mlpInputCh, nullptr);
+                                               this->numTrainRecords * this->mlpInputCh, nullptr);
     this->nnTrainOutput = owlDeviceBufferCreate(context, OWL_FLOAT,
-        this->numTrainRecords * this->mlpOutputCh, nullptr);
+                                                this->numTrainRecords * this->mlpOutputCh, nullptr);
 
     this->gBuffer = owlDeviceBufferCreate(context, OWL_USER_TYPE(GBuffer),
-        frameSize, nullptr);
+                                          frameSize, nullptr);
 
     // Training indices ; fill with regular grid.
     // Shuffle each frame take random pixels as training data
     {
-        int* idxs = (int*)malloc(this->numTrainRecords * sizeof(int));
+        int *idxs = (int *)malloc(this->numTrainRecords * sizeof(int));
         thrust::sequence(thrust::host, idxs, idxs + this->numTrainRecords, 0);
 
         this->trainIdxs = owlDeviceBufferCreate(context, OWL_INT, this->numTrainRecords, idxs);
@@ -147,64 +150,72 @@ void RenderWindow_HairMSNN::initialize()
     // ====================================================
     // Environment lights setup
     // ====================================================
-    if (this->currentScene.hasEnvLight) {
+    if (this->currentScene.hasEnvLight)
+    {
 
         int resx = this->currentScene.env.resolution.x;
         int resy = this->currentScene.env.resolution.y;
         vec2i resolution(resx, resy);
-        float* envMap = this->currentScene.env.pixel_float;
+        float *envMap = this->currentScene.env.pixel_float;
 
-        float* cPdf;
-        float* cCdf;
-        float* mPdf;
-        float* mCdf;
+        float *cPdf;
+        float *cCdf;
+        float *mPdf;
+        float *mCdf;
         generateEnvSamplingTables(resolution, envMap, &cPdf, &cCdf, &mPdf, &mCdf);
 
         this->envTextureBuffer = owlTexture2DCreate(context,
-            OWL_TEXEL_FORMAT_RGBA32F,
-            resx, resy,
-            envMap,
-            OWL_TEXTURE_LINEAR,
-            OWL_TEXTURE_CLAMP);
+                                                    OWL_TEXEL_FORMAT_RGBA32F,
+                                                    resx, resy,
+                                                    envMap,
+                                                    OWL_TEXTURE_LINEAR,
+                                                    OWL_TEXTURE_CLAMP);
         this->envWidth = resx;
         this->envHeight = resy;
 
         this->conditionalPdf = owlTexture2DCreate(context,
-            OWL_TEXEL_FORMAT_R32F,
-            resx + 1, resy,
-            cPdf,
-            OWL_TEXTURE_NEAREST,
-            OWL_TEXTURE_CLAMP);
+                                                  OWL_TEXEL_FORMAT_R32F,
+                                                  resx + 1, resy,
+                                                  cPdf,
+                                                  OWL_TEXTURE_NEAREST,
+                                                  OWL_TEXTURE_CLAMP);
 
         this->conditionalCdf = owlTexture2DCreate(context,
-            OWL_TEXEL_FORMAT_R32F,
-            resx + 1, resy,
-            cCdf,
-            OWL_TEXTURE_NEAREST,
-            OWL_TEXTURE_CLAMP);
+                                                  OWL_TEXEL_FORMAT_R32F,
+                                                  resx + 1, resy,
+                                                  cCdf,
+                                                  OWL_TEXTURE_NEAREST,
+                                                  OWL_TEXTURE_CLAMP);
 
         this->marginalPdf = owlTexture2DCreate(context,
-            OWL_TEXEL_FORMAT_R32F,
-            resy + 1, 1.f,
-            mPdf,
-            OWL_TEXTURE_NEAREST,
-            OWL_TEXTURE_CLAMP);
+                                               OWL_TEXEL_FORMAT_R32F,
+                                               resy + 1, 1.f,
+                                               mPdf,
+                                               OWL_TEXTURE_NEAREST,
+                                               OWL_TEXTURE_CLAMP);
 
         this->marginalCdf = owlTexture2DCreate(context,
-            OWL_TEXEL_FORMAT_R32F,
-            resy + 1, 1.f,
-            mCdf,
-            OWL_TEXTURE_NEAREST,
-            OWL_TEXTURE_CLAMP);
+                                               OWL_TEXEL_FORMAT_R32F,
+                                               resy + 1, 1.f,
+                                               mCdf,
+                                               OWL_TEXTURE_NEAREST,
+                                               OWL_TEXTURE_CLAMP);
 
-        free(cPdf); free(cCdf); free(mPdf); free(mCdf);
+
+
+
+        free(cPdf);
+        free(cCdf);
+        free(mPdf);
+        free(mCdf);
     }
 
     // ====================================================
     // Directional lights setup
     // ====================================================
     this->num_dlights = this->currentScene.dLightFrom.size();
-    for (int i = 0; i < num_dlights; i++) {
+    for (int i = 0; i < num_dlights; i++)
+    {
         DirectionalLight dLight;
         dLight.from = this->currentScene.dLightFrom[i];
         dLight.emit = this->currentScene.dLightEmit[i];
@@ -213,10 +224,10 @@ void RenderWindow_HairMSNN::initialize()
     }
 
     this->dLightsBuffer = owlDeviceBufferCreate(context,
-        OWL_USER_TYPE(DirectionalLight), this->dLightList.size(), this->dLightList.data());
+                                                OWL_USER_TYPE(DirectionalLight), this->dLightList.size(), this->dLightList.data());
 
     // ====================================================
-    // Vector of bottom level accel. structures (BLAS) 
+    // Vector of bottom level accel. structures (BLAS)
     // This is then used to build the top level accel. structure (TLAS)
     // ====================================================
     std::vector<OWLGroup> blasList;
@@ -224,9 +235,11 @@ void RenderWindow_HairMSNN::initialize()
     // ====================================================
     // Surface geometry and data setup
     // ====================================================
-    if (this->currentScene.has_surface) {
+    if (this->currentScene.has_surface)
+    {
         auto surface = this->currentScene.surface;
-        for (auto mesh : surface->meshes) {
+        for (auto mesh : surface->meshes)
+        {
             OWLVarDecl triangleGeomVars[] = {
                 {"vertex", OWL_BUFPTR, OWL_OFFSETOF(TriangleMeshData, vertex)},
                 {"normal", OWL_BUFPTR, OWL_OFFSETOF(TriangleMeshData, normal)},
@@ -241,14 +254,13 @@ void RenderWindow_HairMSNN::initialize()
                 {"alpha_texture", OWL_TEXTURE, OWL_OFFSETOF(TriangleMeshData, alpha_texture)},
                 {"hasAlphaTexture", OWL_BOOL, OWL_OFFSETOF(TriangleMeshData, hasAlphaTexture)},
 
-                {nullptr}
-            };
+                {nullptr}};
 
             OWLGeomType triangleGeomType = owlGeomTypeCreate(context,
-                OWL_GEOM_TRIANGLES,
-                sizeof(TriangleMeshData),
-                triangleGeomVars,
-                -1);
+                                                             OWL_GEOM_TRIANGLES,
+                                                             sizeof(TriangleMeshData),
+                                                             triangleGeomVars,
+                                                             -1);
 
             owlGeomTypeSetClosestHit(triangleGeomType, RADIANCE_RAY_TYPE, module, "triangleMeshCH");
             owlGeomTypeSetAnyHit(triangleGeomType, SHADOW_RAY_TYPE, module, "triangleMeshAHShadow");
@@ -263,44 +275,48 @@ void RenderWindow_HairMSNN::initialize()
             OWLBuffer texCoordBuffer = owlDeviceBufferCreate(context, OWL_FLOAT2, mesh->texcoord.size(), mesh->texcoord.data());
 
             // Create CUDA buffers and upload them for diffuse and alpha textures
-            if (mesh->diffuseTextureID != -1) {
-                Texture* diffuseTexture = surface->textures[mesh->diffuseTextureID];
+            if (mesh->diffuseTextureID != -1)
+            {
+                Texture *diffuseTexture = surface->textures[mesh->diffuseTextureID];
                 OWLTexture diffuseTextureBuffer = owlTexture2DCreate(context,
-                    OWL_TEXEL_FORMAT_RGBA8,
-                    diffuseTexture->resolution.x,
-                    diffuseTexture->resolution.y,
-                    diffuseTexture->pixel,
-                    OWL_TEXTURE_NEAREST,
-                    OWL_TEXTURE_MIRROR);
+                                                                     OWL_TEXEL_FORMAT_RGBA8,
+                                                                     diffuseTexture->resolution.x,
+                                                                     diffuseTexture->resolution.y,
+                                                                     diffuseTexture->pixel,
+                                                                     OWL_TEXTURE_NEAREST,
+                                                                     OWL_TEXTURE_MIRROR);
                 owlGeomSetTexture(triangleGeom, "diffuse_texture", diffuseTextureBuffer);
                 owlGeomSet1b(triangleGeom, "hasDiffuseTexture", true);
             }
-            else {
-                owlGeomSet3f(triangleGeom, "diffuse", owl3f{ mesh->diffuse.x, mesh->diffuse.y, mesh->diffuse.z });
+            else
+            {
+                owlGeomSet3f(triangleGeom, "diffuse", owl3f{mesh->diffuse.x, mesh->diffuse.y, mesh->diffuse.z});
                 owlGeomSet1b(triangleGeom, "hasDiffuseTexture", false);
             }
 
-            if (mesh->alphaTextureID != -1) {
-                Texture* alphaTexture = surface->textures[mesh->alphaTextureID];
+            if (mesh->alphaTextureID != -1)
+            {
+                Texture *alphaTexture = surface->textures[mesh->alphaTextureID];
                 OWLTexture alphaTextureBuffer = owlTexture2DCreate(context,
-                    OWL_TEXEL_FORMAT_RGBA8,
-                    alphaTexture->resolution.x,
-                    alphaTexture->resolution.y,
-                    alphaTexture->pixel,
-                    OWL_TEXTURE_NEAREST,
-                    OWL_TEXTURE_MIRROR);
+                                                                   OWL_TEXEL_FORMAT_RGBA8,
+                                                                   alphaTexture->resolution.x,
+                                                                   alphaTexture->resolution.y,
+                                                                   alphaTexture->pixel,
+                                                                   OWL_TEXTURE_NEAREST,
+                                                                   OWL_TEXTURE_MIRROR);
                 owlGeomSetTexture(triangleGeom, "alpha_texture", alphaTextureBuffer);
                 owlGeomSet1b(triangleGeom, "hasAlphaTexture", true);
             }
-            else {
+            else
+            {
                 owlGeomSet1f(triangleGeom, "alpha", mesh->alpha);
                 owlGeomSet1b(triangleGeom, "hasAlphaTexture", false);
             }
 
             owlTrianglesSetVertices(triangleGeom, vertexBuffer,
-                mesh->vertex.size(), sizeof(vec3f), 0);
+                                    mesh->vertex.size(), sizeof(vec3f), 0);
             owlTrianglesSetIndices(triangleGeom, indexBuffer,
-                mesh->index.size(), sizeof(vec3i), 0);
+                                   mesh->index.size(), sizeof(vec3i), 0);
 
             owlGeomSetBuffer(triangleGeom, "vertex", vertexBuffer2);
             owlGeomSetBuffer(triangleGeom, "normal", normalBuffer);
@@ -324,22 +340,37 @@ void RenderWindow_HairMSNN::initialize()
     // Build the TLAS (IAS) only for surfaces
     // ====================================================
     this->bvhSurfaces = owlInstanceGroupCreate(context,
-        blasList.size(), blasList.data());
+                                               blasList.size(), blasList.data());
     owlGroupBuildAccel(bvhSurfaces);
 
     // ====================================================
     // Hair setup (geometry and BSDF)
     // ====================================================
     OWLVarDecl hairGeomVars[] = {
-        {nullptr}
-    };
+         //   {"color_texture", OWL_TEXTURE, OWL_OFFSETOF(HairData, color_texture)},
+            {nullptr}
+};
+
+//    this->hairColorBuffer = owlTexture2DCreate(context,
+//                                               OWL_TEXEL_FORMAT_RGBA8,
+//                                               currentScene.hairColor.resolution.x,
+//                                               currentScene.hairColor.resolution.y,
+//                                               currentScene.hairColor.pixel,
+//                                               OWL_TEXTURE_NEAREST,
+//                                               OWL_TEXTURE_MIRROR);
 
     OWLGeomType hairGeomType = owlGeomTypeCreate(context,
-        OWL_GEOMETRY_CURVES,
-        sizeof(HairData),
-        hairGeomVars,
-        -1);
-
+                                                 OWL_GEOMETRY_CURVES,
+                                                 sizeof(HairData),
+                                                 hairGeomVars,
+                                                 -1);
+//    OWLTexture hairColorBuffer = owlTexture2DCreate(context,
+//                                                         OWL_TEXEL_FORMAT_RGBA8,
+//                                                         currentScene.hairColor.resolution.x,
+//                                                         currentScene.hairColor.resolution.y,
+//                                                         currentScene.hairColor.pixel,
+//                                                         OWL_TEXTURE_NEAREST,
+//                                                         OWL_TEXTURE_MIRROR);
     owlGeomTypeSetClosestHit(hairGeomType, RADIANCE_RAY_TYPE, module, "hairCH");
     owlGeomTypeSetAnyHit(hairGeomType, SHADOW_RAY_TYPE, module, "hairAHShadow");
     owlGeomTypeSetAnyHit(hairGeomType, MULTISCATTER_RAY_TYPE, module, "hairAHMultiScatter");
@@ -351,12 +382,17 @@ void RenderWindow_HairMSNN::initialize()
 
     this->hairGeom = owlGeomCreate(context, hairGeomType);
 
-    if (this->currentScene.has_hair) {
+  //  owlGeomSetTexture(hairGeom, "color_texture", envTextureBuffer);
+
+
+    if (this->currentScene.has_hair)
+    {
         this->minBound = min(this->currentScene.hairModel.minBound, minBound);
         this->maxBound = max(this->currentScene.hairModel.maxBound, maxBound);
         this->sceneScale = std::max(this->currentScene.hairModel.scale, this->sceneScale);
 
-        for (auto idx : this->currentScene.hairModel.segmentIndices) {
+        for (auto idx : this->currentScene.hairModel.segmentIndices)
+        {
             vec3f p1 = this->currentScene.hairModel.controlPoints[idx];
             vec3f p2 = this->currentScene.hairModel.controlPoints[idx + 1];
             vec3f p3 = this->currentScene.hairModel.controlPoints[idx + 2];
@@ -368,11 +404,11 @@ void RenderWindow_HairMSNN::initialize()
         }
 
         OWLBuffer cpBuffer = owlDeviceBufferCreate(context, OWL_FLOAT3,
-            this->currentScene.hairModel.controlPoints.size(), this->currentScene.hairModel.controlPoints.data());
+                                                   this->currentScene.hairModel.controlPoints.size(), this->currentScene.hairModel.controlPoints.data());
         OWLBuffer widthsBuffer = owlDeviceBufferCreate(context, OWL_FLOAT,
-            this->currentScene.hairModel.widths.size(), this->currentScene.hairModel.widths.data());
+                                                       this->currentScene.hairModel.widths.size(), this->currentScene.hairModel.widths.data());
         OWLBuffer indicesBuffer = owlDeviceBufferCreate(context, OWL_INT,
-            this->currentScene.hairModel.segmentIndices.size(), this->currentScene.hairModel.segmentIndices.data());
+                                                        this->currentScene.hairModel.segmentIndices.size(), this->currentScene.hairModel.segmentIndices.data());
 
         owlCurvesSetControlPoints(this->hairGeom, this->currentScene.hairModel.controlPoints.size(), cpBuffer, widthsBuffer);
         owlCurvesSetSegmentIndices(this->hairGeom, this->currentScene.hairModel.segmentIndices.size(), indicesBuffer);
@@ -392,16 +428,16 @@ void RenderWindow_HairMSNN::initialize()
     // Sampling indices
     // ====================================================
     {
-        int* idxs = (int*)malloc(this->numSamples * sizeof(int));
+        int *idxs = (int *)malloc(this->numSamples * sizeof(int));
         thrust::sequence(thrust::host, idxs, idxs + this->numSamples, 0);
 
         thrust::shuffle(idxs, idxs + this->numSamples, thrust::random::default_random_engine());
         this->sceneIndicesBuf = owlDeviceBufferCreate(context,
-            OWL_INT, this->numSamples, idxs);
+                                                      OWL_INT, this->numSamples, idxs);
 
         thrust::shuffle(idxs, idxs + this->numSamples, thrust::random::default_random_engine());
         this->omegaIndicesBuf = owlDeviceBufferCreate(context,
-            OWL_INT, this->numSamples, idxs);
+                                                      OWL_INT, this->numSamples, idxs);
 
         free(idxs);
     }
@@ -468,13 +504,20 @@ void RenderWindow_HairMSNN::initialize()
         {"num_total_lights", OWL_INT, OWL_OFFSETOF(LaunchParams, num_total_lights)},
         // Integrator parameters
         {"MIS", OWL_BOOL, OWL_OFFSETOF(LaunchParams, MIS)},
+        {"shownn", OWL_BOOL, OWL_OFFSETOF(LaunchParams, shownn)},
+        {"showpt", OWL_BOOL, OWL_OFFSETOF(LaunchParams, showpt)},
+        {"useLast", OWL_BOOL, OWL_OFFSETOF(LaunchParams, useLast)},
         {"envPdfSampling", OWL_BOOL, OWL_OFFSETOF(LaunchParams, envPdfSampling)},
         // Scene properties
         {"maxBound", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, maxBound)},
         {"minBound", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, minBound)},
         {"sceneScale", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, sceneScale)},
         // Global Hair parameters
-        {"sig_a", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, hairData.sig_a)},
+      //  owlParamsSetTexture(this->launchParams,"hairColor",this->hairColorBuffer);
+      //  {"hairColor", OWL_TEXTURE, OWL_OFFSETOF(LaunchParams, hairData.color)},
+
+       // {"hairColor", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, hairData.color)},
+            {"sig_a", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, hairData.sig_a)},
         {"beta_m", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, hairData.beta_m)},
         {"beta_n", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, hairData.beta_n)},
         {"alpha", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, hairData.alpha)},
@@ -498,15 +541,14 @@ void RenderWindow_HairMSNN::initialize()
         {"camera.dir_00", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, camera.dir_00)},
         {"camera.dir_du", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, camera.dir_du)},
         {"camera.dir_dv", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, camera.dir_dv)},
-        {nullptr}
-    };
+        {nullptr}};
 
     this->launchParams = owlParamsCreate(context, sizeof(LaunchParams), launchParamsDecl, -1);
 
     this->setRenderComponents();
 
     // Global hair parameters
-    owlParamsSet3f(this->launchParams, "sig_a", owl3f{ this->currentScene.sig_a.x, this->currentScene.sig_a.y, this->currentScene.sig_a.z });
+    owlParamsSet3f(this->launchParams, "sig_a", owl3f{this->currentScene.sig_a.x, this->currentScene.sig_a.y, this->currentScene.sig_a.z});
     owlParamsSet1f(this->launchParams, "beta_m", this->currentScene.beta_m);
     owlParamsSet1f(this->launchParams, "beta_n", this->currentScene.beta_n);
     owlParamsSet1f(this->launchParams, "alpha", this->currentScene.alpha);
@@ -515,6 +557,12 @@ void RenderWindow_HairMSNN::initialize()
     owlParamsSet1f(this->launchParams, "TT_G", this->currentScene.TT_G);
     owlParamsSet1f(this->launchParams, "TRT_G", this->currentScene.TRT_G);
     owlParamsSet1f(this->launchParams, "TRRT_G", this->currentScene.TRRT_G);
+
+    owlParamsSet1b(this->launchParams,"useLast",true);
+
+   // owlParamsSetTexture(this->launchParams,"hairColor",this->hairColorBuffer);
+
+
 
     // Upload NRC variables
     owlParamsSet1i(this->launchParams, "numTrainRecordsX", this->numTrainRecordsX);
@@ -539,6 +587,8 @@ void RenderWindow_HairMSNN::initialize()
     owlParamsSetBuffer(this->launchParams, "nnTrainInput", this->nnTrainInput);
     owlParamsSetBuffer(this->launchParams, "nnTrainOutput", this->nnTrainOutput);
 
+
+
     owlParamsSet1i(this->launchParams, "mlpInputCh", this->mlpInputCh);
     owlParamsSet1i(this->launchParams, "mlpOutputCh", this->mlpOutputCh);
 
@@ -546,8 +596,8 @@ void RenderWindow_HairMSNN::initialize()
     owlParamsSet1i(this->launchParams, "pathV2", this->currentScene.path_v2);
 
     // Upload scene properties
-    owlParamsSet3f(this->launchParams, "maxBound", owl3f{ this->maxBound.x, this->maxBound.y, this->maxBound.z });
-    owlParamsSet3f(this->launchParams, "minBound", owl3f{ this->minBound.x, this->minBound.y, this->minBound.z });
+    owlParamsSet3f(this->launchParams, "maxBound", owl3f{this->maxBound.x, this->maxBound.y, this->maxBound.z});
+    owlParamsSet3f(this->launchParams, "minBound", owl3f{this->minBound.x, this->minBound.y, this->minBound.z});
     owlParamsSet1f(this->launchParams, "sceneScale", this->sceneScale);
 
     // Upload integrator parameters
@@ -564,6 +614,9 @@ void RenderWindow_HairMSNN::initialize()
 
     int num_total_lights = 0;
 
+  //  if(this->currentScene.hasHairColor){
+   // }
+
     // Upload environment light
     owlParamsSet1f(this->launchParams, "envRotPhi", this->currentScene.envRotPhi);
     owlParamsSet1f(this->launchParams, "envScale", this->currentScene.envScale);
@@ -571,7 +624,14 @@ void RenderWindow_HairMSNN::initialize()
     owlParamsSet1i(this->launchParams, "envHeight", this->envHeight);
     owlParamsSet1b(this->launchParams, "envPdfSampling", this->currentScene.envPdfSampling);
     owlParamsSet1b(this->launchParams, "hasEnvLight", this->currentScene.hasEnvLight);
-    if (this->currentScene.hasEnvLight) {
+
+
+    owlParamsSet1b(this->launchParams, "shownn", true);
+    owlParamsSet1b(this->launchParams, "showpt", true);
+
+
+    if (this->currentScene.hasEnvLight)
+    {
         owlParamsSetTexture(this->launchParams, "env", this->envTextureBuffer);
 
         owlParamsSetTexture(this->launchParams, "conditionalPdf", this->conditionalPdf);
@@ -596,13 +656,12 @@ void RenderWindow_HairMSNN::initialize()
     // ====================================================
     OWLVarDecl missProgVars[] = {
         {"const_color", OWL_FLOAT3, OWL_OFFSETOF(MissProgData, const_color)},
-        {nullptr}
-    };
+        {nullptr}};
 
     missProg = owlMissProgCreate(context, module, "miss", sizeof(MissProgData), missProgVars, -1);
 
     // Set a constant background color in the miss program (black for now)
-    owlMissProgSet3f(missProg, "const_color", owl3f{ 0.f, 0.f, 0.f });
+    owlMissProgSet3f(missProg, "const_color", owl3f{0.f, 0.f, 0.f});
 
     // ====================================================
     // Setup a pin-hole camera ray-gen program
@@ -610,8 +669,7 @@ void RenderWindow_HairMSNN::initialize()
     OWLVarDecl rayGenVars[] = {
         {"frameBuffer", OWL_RAW_POINTER, OWL_OFFSETOF(RayGenData, frameBuffer)},
         {"frameBufferSize", OWL_INT2, OWL_OFFSETOF(RayGenData, frameBufferSize)},
-        {nullptr}
-    };
+        {nullptr}};
 
     // Create regular ray gen
     this->rayGen = owlRayGenCreate(context, module, "rayGenCam", sizeof(RayGenData), rayGenVars, -1);
@@ -632,15 +690,16 @@ void RenderWindow_HairMSNN::initialize()
 
     // Initial 1 sec training
     long long time = 0;
-    while (true) {
+    while (true)
+    {
         time += this->genTrainingData();
         time += this->train();
-    
+
         if (time > 1000000)
             break;
     }
-    
-    std::cout << "Initial training: " << (float) time / 1e6 << " sec" << std::endl;
+
+    std::cout << "Initial training: " << (float)time / 1e6 << " sec" << std::endl;
     this->cameraChanged();
 }
 
@@ -648,7 +707,8 @@ long long RenderWindow_HairMSNN::genTrainingData()
 {
     auto start = std::chrono::high_resolution_clock::now();
 
-    if (sbtDirty) {
+    if (sbtDirty)
+    {
         owlBuildSBT(context);
         sbtDirty = false;
     }
@@ -670,22 +730,22 @@ long long RenderWindow_HairMSNN::train()
 
     // Shuffle
     {
-        int* devicePtr = (int*)owlBufferGetPointer(this->sceneIndicesBuf, 0);
+        int *devicePtr = (int *)owlBufferGetPointer(this->sceneIndicesBuf, 0);
         thrust::device_ptr<int> thrustPtr = thrust::device_pointer_cast(devicePtr);
         thrust::shuffle(thrustPtr, thrustPtr + this->numSamples, thrust::default_random_engine());
     }
 
     // Train
     {
-        float* trainInputPtr = (float*)owlBufferGetPointer(this->nnTrainInput, 0);
-        float* trainGTPtr = (float*)owlBufferGetPointer(this->nnTrainOutput, 0);
+        float *trainInputPtr = (float *)owlBufferGetPointer(this->nnTrainInput, 0);
+        float *trainGTPtr = (float *)owlBufferGetPointer(this->nnTrainOutput, 0);
 
         GPUMatrix<float> trainInput(trainInputPtr,
-            this->mlpInputCh,
-            this->numTrainRecords);
+                                    this->mlpInputCh,
+                                    this->numTrainRecords);
         GPUMatrix<float> trainGT(trainGTPtr,
-            this->mlpOutputCh,
-            this->numTrainRecords);
+                                 this->mlpOutputCh,
+                                 this->numTrainRecords);
 
         auto ctx = this->mlp->trainer->training_step(trainInput, trainGT);
         this->trainingLoss = mlp->trainer->loss(*ctx);
@@ -700,16 +760,18 @@ long long RenderWindow_HairMSNN::render()
 {
     auto startFull = std::chrono::high_resolution_clock::now();
 
-    if (sbtDirty) {
+    if (sbtDirty)
+    {
         owlBuildSBT(context);
         sbtDirty = false;
     }
 
-    if (this->accumId < this->currentScene.spp || this->progressive) {
+    if (this->accumId < this->currentScene.spp || this->progressive)
+    {
         owlParamsSet1i(this->launchParams, "accumId", this->accumId);
 
         // Shuffle, to choose random pixels as training points
-        int* trainIdxsPtr = (int*)owlBufferGetPointer(this->trainIdxs, 0);
+        int *trainIdxsPtr = (int *)owlBufferGetPointer(this->trainIdxs, 0);
         thrust::device_ptr<int> thrustPtr = thrust::device_pointer_cast(trainIdxsPtr);
         thrust::shuffle(thrustPtr, thrustPtr + this->numTrainRecords, thrust::default_random_engine());
 
@@ -729,7 +791,8 @@ long long RenderWindow_HairMSNN::render()
         {
             auto start = std::chrono::high_resolution_clock::now();
 
-            if (this->currentScene.nrcTrain) {
+            if (this->currentScene.nrcTrain)
+            {
                 this->train();
             }
 
@@ -742,8 +805,8 @@ long long RenderWindow_HairMSNN::render()
             auto start = std::chrono::high_resolution_clock::now();
 
             {
-                float* networkInput = (float*)owlBufferGetPointer(this->nnFrameInput, 0);
-                float* networkOutput = (float*)owlBufferGetPointer(this->nnFrameOutput, 0);
+                float *networkInput = (float *)owlBufferGetPointer(this->nnFrameInput, 0);
+                float *networkOutput = (float *)owlBufferGetPointer(this->nnFrameOutput, 0);
                 this->mlp->inference(networkInput, networkOutput, this->fbSize.x * this->fbSize.y);
             }
 
@@ -770,9 +833,10 @@ long long RenderWindow_HairMSNN::render()
     return std::chrono::duration_cast<std::chrono::microseconds>(finishFull - startFull).count();
 }
 
-void RenderWindow_HairMSNN::resize(const vec2i& newSize)
+void RenderWindow_HairMSNN::resize(const vec2i &newSize)
 {
-    if (this->getWindowSize().x == 0 && this->getWindowSize().y == 0) {
+    if (this->getWindowSize().x == 0 && this->getWindowSize().y == 0)
+    {
         OWLViewer::resize(newSize);
 
         this->initialize();
@@ -787,205 +851,265 @@ void RenderWindow_HairMSNN::drawUI()
     ImGui::NewFrame();
 
     {
-        ImGui::Begin("Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-        ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::Begin("Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+            ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-        bool prog = this->progressive;
-        ImGui::Checkbox("Progressive", &prog);
-        if (prog != this->progressive) {
-            this->progressive = prog;
+            bool prog = this->progressive;
+            ImGui::Checkbox("Progressive", &prog);
+            if(progressive !=prog){
+           progressive = prog;
+            cameraChanged();
+        }
+
+            bool shownn_ = this->shownn;
+            bool showpt_ = showpt;
+
+            ImGui::Checkbox("shownn", &shownn_);
+            if (shownn_ != this->shownn)
+            {
+                this->shownn = shownn_;
+                owlParamsSet1b(this->launchParams, "shownn", this->shownn);
+                this->cameraChanged();
+            }
+
+        ImGui::Checkbox("showpt", &showpt_);
+        if (showpt_ != this->showpt)
+        {
+            this->showpt = showpt_;
+            owlParamsSet1b(this->launchParams, "showpt", this->showpt);
             this->cameraChanged();
         }
 
-        bool den = this->currentScene.denoise;
-        ImGui::Checkbox("Denoise", &den);
-        if (den != this->currentScene.denoise) {
-            this->currentScene.denoise = den;
+
+
+            int beta_ = this->beta;
+            ImGui::InputInt("shortPath", &beta_);
+            if(beta_!=beta){
+            owlParamsSet1i(this->launchParams, "beta", beta_);
+            this->beta = beta_;
             this->cameraChanged();
         }
 
-        if (!this->progressive) {
-            int currentSpp = this->currentScene.spp;
-            ImGui::SliderInt("SPP", &currentSpp, 0, 100);
-            if (currentSpp != this->currentScene.spp) {
-                this->currentScene.spp = currentSpp;
-                this->cameraChanged();
-            }
-        }
 
-        if (ImGui::CollapsingHeader("TCNN")) {
 
-            bool train = this->currentScene.nrcTrain;
-            ImGui::Checkbox("Train TCNN", &train);
-            if (train != this->currentScene.nrcTrain) {
-                this->setNRCTrain(train);
-            }
-
-            if (ImGui::Button("Reset Network")) {
-                this->resetNetwork();
-            }
-        }
-
-        // Sampling controls
-        if (ImGui::CollapsingHeader("Sampling")) {
-            bool currentMIS = this->currentScene.MIS;
-            ImGui::Checkbox("MIS", &currentMIS);
-            if (currentMIS != this->currentScene.MIS) {
-                this->currentScene.MIS = currentMIS;
-                owlParamsSet1b(this->launchParams, "MIS", currentMIS);
+            bool den = this->currentScene.denoise;
+            ImGui::Checkbox("Denoise", &den);
+            if (den != this->currentScene.denoise)
+            {
+                this->currentScene.denoise = den;
                 this->cameraChanged();
             }
 
-            bool currentEnvSampling = this->currentScene.envPdfSampling;
-            ImGui::Checkbox("Env. PDF Samp.", &currentEnvSampling);
-            if (currentEnvSampling != this->currentScene.envPdfSampling) {
-                this->currentScene.envPdfSampling = currentEnvSampling;
-                owlParamsSet1b(this->launchParams, "envPdfSampling", currentEnvSampling);
-                this->cameraChanged();
-            }
-        }
 
-        // All hair controls
-        if (ImGui::CollapsingHeader("Hair")) {
-            float cur_sig_a[3] = { this->currentScene.sig_a.x, this->currentScene.sig_a.y,
-                                                this->currentScene.sig_a.z };
-            ImGui::SliderFloat3("Sigma", cur_sig_a, 0.f, 10.f);
-            if (this->currentScene.sig_a.x != cur_sig_a[0] ||
-                this->currentScene.sig_a.y != cur_sig_a[1] ||
-                this->currentScene.sig_a.z != cur_sig_a[2]) {
-                this->currentScene.sig_a = vec3f(cur_sig_a[0], cur_sig_a[1], cur_sig_a[2]);
-                owlParamsSet3f(this->launchParams, "sig_a", owl3f{ cur_sig_a[0], cur_sig_a[1],
-                                                                cur_sig_a[2] });
-                this->cameraChanged();
+
+            if (!this->progressive)
+            {
+                int currentSpp = this->currentScene.spp;
+                ImGui::SliderInt("SPP", &currentSpp, 0, 100);
+                if (currentSpp != this->currentScene.spp)
+                {
+                    this->currentScene.spp = currentSpp;
+                    this->cameraChanged();
+                }
             }
 
-            float cur_beta_m = this->currentScene.beta_m;
-            ImGui::SliderFloat("beta_m", &cur_beta_m, 0.f, 1.f);
-            if (cur_beta_m != this->currentScene.beta_m) {
-                this->currentScene.beta_m = cur_beta_m;
-                owlParamsSet1f(this->launchParams, "beta_m", cur_beta_m);
-                this->cameraChanged();
-            }
+            if (ImGui::CollapsingHeader("TCNN"))
+            {
 
-            float cur_beta_n = this->currentScene.beta_n;
-            ImGui::SliderFloat("beta_n", &cur_beta_n, 0.f, 1.f);
-            if (cur_beta_n != this->currentScene.beta_n) {
-                this->currentScene.beta_n = cur_beta_n;
-                owlParamsSet1f(this->launchParams, "beta_n", cur_beta_n);
-                this->cameraChanged();
-            }
-
-            float cur_alpha = this->currentScene.alpha;
-            ImGui::SliderFloat("alpha", &cur_alpha, 0.f, 20.f * 3.14159f / 180.f);
-            if (cur_alpha != this->currentScene.alpha) {
-                this->currentScene.alpha = cur_alpha;
-                owlParamsSet1f(this->launchParams, "alpha", cur_alpha);
-                this->cameraChanged();
-            }
-
-            float rg = this->currentScene.R_G;
-            ImGui::SliderFloat("R Gain", &rg, 0.f, 1.f);
-            if (rg != this->currentScene.R_G) {
-                this->currentScene.R_G = rg;
-                owlParamsSet1f(this->launchParams, "R_G", rg);
-                this->cameraChanged();
-            }
-
-            float ttg = this->currentScene.TT_G;
-            ImGui::SliderFloat("TT Gain", &ttg, 0.f, 1.f);
-            if (ttg != this->currentScene.TT_G) {
-                this->currentScene.TT_G = ttg;
-                owlParamsSet1f(this->launchParams, "TT_G", ttg);
-                this->cameraChanged();
-            }
-
-            float trtg = this->currentScene.TRT_G;
-            ImGui::SliderFloat("TRT Gain", &trtg, 0.f, 1.f);
-            if (trtg != this->currentScene.TRT_G) {
-                this->currentScene.TRT_G = trtg;
-                owlParamsSet1f(this->launchParams, "TRT_G", trtg);
-                this->cameraChanged();
-            }
-
-            float trrtg = this->currentScene.TRRT_G;
-            ImGui::SliderFloat("TRRT Gain", &trrtg, 0.f, 1.f);
-            if (trrtg != this->currentScene.TRRT_G) {
-                this->currentScene.TRRT_G = trrtg;
-                owlParamsSet1f(this->launchParams, "TRRT_G", trrtg);
-                this->cameraChanged();
-            }
-        }
-
-        // All lighting controls
-        if (ImGui::CollapsingHeader("Light")) {
-
-            if (ImGui::TreeNode("Environment Light")) {
-                // Controls for environment light
-                if (this->currentScene.hasEnvLight) {
-                    float scale = this->currentScene.envScale;
-                    ImGui::SliderFloat("Radiance Scale", &scale, 0.f, 100.f);
-                    if (scale != this->currentScene.envScale) {
-                        this->currentScene.envScale = scale;
-                        owlParamsSet1f(this->launchParams, "envScale", scale);
-                        this->cameraChanged();
-                    }
-
-                    float rot = this->currentScene.envRotPhi;
-                    ImGui::SliderFloat("Rotation", &rot, 0.f, 3.14159f * 2.f);
-                    if (rot != this->currentScene.envRotPhi) {
-                        this->currentScene.envRotPhi = rot;
-                        owlParamsSet1f(this->launchParams, "envRotPhi", rot);
-                        this->cameraChanged();
-                    }
+                bool train = this->currentScene.nrcTrain;
+                ImGui::Checkbox("Train TCNN", &train);
+                if (train != this->currentScene.nrcTrain)
+                {
+                    this->setNRCTrain(train);
                 }
 
-                ImGui::TreePop();
+                if (ImGui::Button("Reset Network"))
+                {
+                    this->resetNetwork();
+                }
             }
 
-            if (ImGui::TreeNode("Directional Lights")) {
-                // Controls for directional lights
-                for (int i = 0; i < this->num_dlights; i++) {
-                    float dLightFrom[3] = {
-                        this->dLightList[i].from.x,
-                        this->dLightList[i].from.y,
-                        this->dLightList[i].from.z
-                    };
-                    std::string sname = "Dir " + std::to_string(i + 1);
-                    ImGui::SliderFloat3(sname.c_str(), dLightFrom, -1.f, 1.f);
-
-                    if (dLightFrom[0] != this->dLightList[i].from.x ||
-                        dLightFrom[1] != this->dLightList[i].from.y ||
-                        dLightFrom[2] != this->dLightList[i].from.z) {
-
-                        this->dLightList[i].from = vec3f(dLightFrom[0], dLightFrom[1], dLightFrom[2]);
-                        this->uploadLights();
-                    }
-
-                    float emit = this->dLightList[i].emit.x;
-                    ImGui::SliderFloat("Emit", &emit, 0.f, 100.f);
-                    if (emit != this->dLightList[i].emit.x) {
-                        this->dLightList[i].emit = vec3f(emit);
-                        this->uploadLights();
-                    }
+            // Sampling controls
+            if (ImGui::CollapsingHeader("Sampling"))
+            {
+                bool currentMIS = this->currentScene.MIS;
+                ImGui::Checkbox("MIS", &currentMIS);
+                if (currentMIS != this->currentScene.MIS)
+                {
+                    this->currentScene.MIS = currentMIS;
+                    owlParamsSet1b(this->launchParams, "MIS", currentMIS);
+                    this->cameraChanged();
                 }
 
-                ImGui::TreePop();
+                bool currentEnvSampling = this->currentScene.envPdfSampling;
+                ImGui::Checkbox("Env. PDF Samp.", &currentEnvSampling);
+                if (currentEnvSampling != this->currentScene.envPdfSampling)
+                {
+                    this->currentScene.envPdfSampling = currentEnvSampling;
+                    owlParamsSet1b(this->launchParams, "envPdfSampling", currentEnvSampling);
+                    this->cameraChanged();
+                }
             }
-        }
 
-        if (ImGui::Button("Save PNG")) {
-            this->screenShot(this->currentScene.renderOutput);
-        }
+            // All hair controls
+            if (ImGui::CollapsingHeader("Hair"))
+            {
+                float cur_sig_a[3] = {this->currentScene.sig_a.x, this->currentScene.sig_a.y,
+                                      this->currentScene.sig_a.z};
+                ImGui::SliderFloat3("Sigma", cur_sig_a, 0.f, 10.f);
+                if (this->currentScene.sig_a.x != cur_sig_a[0] ||
+                    this->currentScene.sig_a.y != cur_sig_a[1] ||
+                    this->currentScene.sig_a.z != cur_sig_a[2])
+                {
+                    this->currentScene.sig_a = vec3f(cur_sig_a[0], cur_sig_a[1], cur_sig_a[2]);
+                    owlParamsSet3f(this->launchParams, "sig_a", owl3f{cur_sig_a[0], cur_sig_a[1], cur_sig_a[2]});
+                    this->cameraChanged();
+                }
 
-        if (ImGui::Button("Save EXR")) {
-            std::string exrFile = this->currentScene.renderOutput;
-            size_t pos = exrFile.find(".png");
-            exrFile.replace(pos, 4, ".exr");
+                float cur_beta_m = this->currentScene.beta_m;
+                ImGui::SliderFloat("beta_m", &cur_beta_m, 0.f, 1.f);
+                if (cur_beta_m != this->currentScene.beta_m)
+                {
+                    this->currentScene.beta_m = cur_beta_m;
+                    owlParamsSet1f(this->launchParams, "beta_m", cur_beta_m);
+                    this->cameraChanged();
+                }
 
-            this->screenShotEXR(exrFile);
-        }
+                float cur_beta_n = this->currentScene.beta_n;
+                ImGui::SliderFloat("beta_n", &cur_beta_n, 0.f, 1.f);
+                if (cur_beta_n != this->currentScene.beta_n)
+                {
+                    this->currentScene.beta_n = cur_beta_n;
+                    owlParamsSet1f(this->launchParams, "beta_n", cur_beta_n);
+                    this->cameraChanged();
+                }
 
-        ImGui::End();
+                float cur_alpha = this->currentScene.alpha;
+                ImGui::SliderFloat("alpha", &cur_alpha, 0.f, 20.f * 3.14159f / 180.f);
+                if (cur_alpha != this->currentScene.alpha)
+                {
+                    this->currentScene.alpha = cur_alpha;
+                    owlParamsSet1f(this->launchParams, "alpha", cur_alpha);
+                    this->cameraChanged();
+                }
+
+                float rg = this->currentScene.R_G;
+                ImGui::SliderFloat("R Gain", &rg, 0.f, 1.f);
+                if (rg != this->currentScene.R_G)
+                {
+                    this->currentScene.R_G = rg;
+                    owlParamsSet1f(this->launchParams, "R_G", rg);
+                    this->cameraChanged();
+                }
+
+                float ttg = this->currentScene.TT_G;
+                ImGui::SliderFloat("TT Gain", &ttg, 0.f, 1.f);
+                if (ttg != this->currentScene.TT_G)
+                {
+                    this->currentScene.TT_G = ttg;
+                    owlParamsSet1f(this->launchParams, "TT_G", ttg);
+                    this->cameraChanged();
+                }
+
+                float trtg = this->currentScene.TRT_G;
+                ImGui::SliderFloat("TRT Gain", &trtg, 0.f, 1.f);
+                if (trtg != this->currentScene.TRT_G)
+                {
+                    this->currentScene.TRT_G = trtg;
+                    owlParamsSet1f(this->launchParams, "TRT_G", trtg);
+                    this->cameraChanged();
+                }
+
+                float trrtg = this->currentScene.TRRT_G;
+                ImGui::SliderFloat("TRRT Gain", &trrtg, 0.f, 1.f);
+                if (trrtg != this->currentScene.TRRT_G)
+                {
+                    this->currentScene.TRRT_G = trrtg;
+                    owlParamsSet1f(this->launchParams, "TRRT_G", trrtg);
+                    this->cameraChanged();
+                }
+            }
+
+            // All lighting controls
+            if (ImGui::CollapsingHeader("Light"))
+            {
+
+                if (ImGui::TreeNode("Environment Light"))
+                {
+                    // Controls for environment light
+                    if (this->currentScene.hasEnvLight)
+                    {
+                        float scale = this->currentScene.envScale;
+                        ImGui::SliderFloat("Radiance Scale", &scale, 0.f, 100.f);
+                        if (scale != this->currentScene.envScale)
+                        {
+                            this->currentScene.envScale = scale;
+                            owlParamsSet1f(this->launchParams, "envScale", scale);
+                            this->cameraChanged();
+                        }
+
+                        float rot = this->currentScene.envRotPhi;
+                        ImGui::SliderFloat("Rotation", &rot, 0.f, 3.14159f * 2.f);
+                        if (rot != this->currentScene.envRotPhi)
+                        {
+                            this->currentScene.envRotPhi = rot;
+                            owlParamsSet1f(this->launchParams, "envRotPhi", rot);
+                            this->cameraChanged();
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
+
+                if (ImGui::TreeNode("Directional Lights"))
+                {
+                    // Controls for directional lights
+                    for (int i = 0; i < this->num_dlights; i++)
+                    {
+                        float dLightFrom[3] = {
+                            this->dLightList[i].from.x,
+                            this->dLightList[i].from.y,
+                            this->dLightList[i].from.z};
+                        std::string sname = "Dir " + std::to_string(i + 1);
+                        ImGui::SliderFloat3(sname.c_str(), dLightFrom, -1.f, 1.f);
+
+                        if (dLightFrom[0] != this->dLightList[i].from.x ||
+                            dLightFrom[1] != this->dLightList[i].from.y ||
+                            dLightFrom[2] != this->dLightList[i].from.z)
+                        {
+
+                            this->dLightList[i].from = vec3f(dLightFrom[0], dLightFrom[1], dLightFrom[2]);
+                            this->uploadLights();
+                        }
+
+                        float emit = this->dLightList[i].emit.x;
+                        ImGui::SliderFloat("Emit", &emit, 0.f, 100.f);
+                        if (emit != this->dLightList[i].emit.x)
+                        {
+                            this->dLightList[i].emit = vec3f(emit);
+                            this->uploadLights();
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
+            }
+
+            if (ImGui::Button("Save PNG"))
+            {
+                this->screenShot(this->currentScene.renderOutput);
+            }
+
+            if (ImGui::Button("Save EXR"))
+            {
+                std::string exrFile = this->currentScene.renderOutput;
+                size_t pos = exrFile.find(".png");
+                exrFile.replace(pos, 4, ".exr");
+
+                this->screenShotEXR(exrFile);
+            }
+
+            ImGui::End();
     }
 
     ImGui::Render();
@@ -998,7 +1122,7 @@ void RenderWindow_HairMSNN::drawUI()
 void RenderWindow_HairMSNN::screenShotEXR(std::string fname)
 {
     int bufferSize = this->fbSize.x * this->fbSize.y * 4 * sizeof(float);
-    float* hostBuffer = (float*)malloc(bufferSize);
+    float *hostBuffer = (float *)malloc(bufferSize);
 
     if (this->saveComponents)
     {
@@ -1029,23 +1153,24 @@ void RenderWindow_HairMSNN::screenShotEXR(std::string fname)
     free(hostBuffer);
 }
 
-RenderWindow_HairMSNN::RenderWindow_HairMSNN(Scene& scene, vec2i resolution, bool interactive)
+RenderWindow_HairMSNN::RenderWindow_HairMSNN(Scene &scene, vec2i resolution, bool interactive)
     : owl::viewer::OWLViewer("Real-time hair", resolution, interactive, false)
 {
     this->currentScene = scene;
 
     this->camera.setOrientation(scene.camera.from,
-        scene.camera.at,
-        scene.camera.up,
-        owl::viewer::toDegrees(acosf(scene.camera.cosFovy)));
+                                scene.camera.at,
+                                scene.camera.up,
+                                owl::viewer::toDegrees(acosf(scene.camera.cosFovy)));
 
-    if(interactive)
+    if (interactive)
         this->enableFlyMode();
 
     // Initialize IMGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
 
     ImGui::StyleColorsDark();
 
@@ -1060,13 +1185,15 @@ RenderWindow_HairMSNN::RenderWindow_HairMSNN(Scene& scene, vec2i resolution, boo
     owlEnableCurves(context); // Required since hair strands are represented by curves
 }
 
-void RenderWindow_HairMSNN::customKey(char key, const vec2i& pos)
+void RenderWindow_HairMSNN::customKey(char key, const vec2i &pos)
 {
-    if (key == '1' || key == '!') {
+    if (key == '1' || key == '!')
+    {
         this->camera.setOrientation(this->camera.getFrom(), vec3f(0.f), vec3f(0.f, 0.f, 1.f), this->camera.getFovyInDegrees());
         this->cameraChanged();
     }
-    else if (key == 'R' || key == 'r') {
+    else if (key == 'R' || key == 'r')
+    {
         SceneCamera cam;
         cam.from = this->camera.getFrom();
         cam.at = this->camera.getAt();
@@ -1076,7 +1203,8 @@ void RenderWindow_HairMSNN::customKey(char key, const vec2i& pos)
         nlohmann::json oneCameraJson;
         std::vector<float> from, at, up;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++)
+        {
             from.push_back(cam.from[i]);
             at.push_back(cam.at[i]);
             up.push_back(cam.up[i]);
@@ -1105,24 +1233,21 @@ void RenderWindow_HairMSNN::cameraChanged()
 
     // ----------- compute variable values  ------------------
     vec3f camera_pos = lookFrom;
-    vec3f camera_d00
-        = normalize(lookAt - lookFrom);
+    vec3f camera_d00 = normalize(lookAt - lookFrom);
     float aspect = fbSize.x / float(fbSize.y);
-    vec3f camera_ddu
-        = cosFovy * aspect * normalize(cross(camera_d00, lookUp));
-    vec3f camera_ddv
-        = cosFovy * normalize(cross(camera_ddu, camera_d00));
+    vec3f camera_ddu = cosFovy * aspect * normalize(cross(camera_d00, lookUp));
+    vec3f camera_ddv = cosFovy * normalize(cross(camera_ddu, camera_d00));
     camera_d00 -= 0.5f * camera_ddu;
     camera_d00 -= 0.5f * camera_ddv;
 
     // ----------- set variables  ----------------------------
     owlRayGenSet1ul(this->rayGen, "frameBuffer", (uint64_t)this->fbPointer);
-    owlRayGenSet2i(this->rayGen, "frameBufferSize", (const owl2i&)this->fbSize);
+    owlRayGenSet2i(this->rayGen, "frameBufferSize", (const owl2i &)this->fbSize);
 
-    owlParamsSet3f(this->launchParams, "camera.pos", (const owl3f&)camera_pos);
-    owlParamsSet3f(this->launchParams, "camera.dir_00", (const owl3f&)camera_d00);
-    owlParamsSet3f(this->launchParams, "camera.dir_du", (const owl3f&)camera_ddu);
-    owlParamsSet3f(this->launchParams, "camera.dir_dv", (const owl3f&)camera_ddv);
+    owlParamsSet3f(this->launchParams, "camera.pos", (const owl3f &)camera_pos);
+    owlParamsSet3f(this->launchParams, "camera.dir_00", (const owl3f &)camera_d00);
+    owlParamsSet3f(this->launchParams, "camera.dir_du", (const owl3f &)camera_ddu);
+    owlParamsSet3f(this->launchParams, "camera.dir_dv", (const owl3f &)camera_ddv);
 
     this->sbtDirty = true;
 }
@@ -1131,7 +1256,7 @@ void RenderWindow_HairMSNN::uploadLights()
 {
     // Directional lights
     this->dLightsBuffer = owlDeviceBufferCreate(context,
-        OWL_USER_TYPE(DirectionalLight), this->dLightList.size(), this->dLightList.data());
+                                                OWL_USER_TYPE(DirectionalLight), this->dLightList.size(), this->dLightList.data());
 
     // Upload directional lights
     owlParamsSetBuffer(this->launchParams, "dLights", dLightsBuffer);
@@ -1141,17 +1266,19 @@ void RenderWindow_HairMSNN::uploadLights()
 }
 
 // ====================================================
-// Entry point 
+// Entry point
 // ====================================================
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     std::string renderer = "HairMSNN";
 
-    std::string currentScene = "C:/Users/Projects/HairMSNN/scenes/straight/config.json";
+    std::string currentScene = "E:/code/HairMSNN/scenes/straight/config.json";
+    currentScene = "E:/code/HairMSNN/scenes/curly/config.json";;
+
     if (argc >= 2)
         currentScene = std::string(argv[1]);
 
-    int currentBeta = 1;
+    int currentBeta = 5;
     if (argc >= 3)
         currentBeta = atoi(argv[2]);
 
@@ -1159,7 +1286,8 @@ int main(int argc, char** argv)
 
     Scene scene;
     bool success = parseScene(currentScene, scene);
-    if (!success) {
+    if (!success)
+    {
         LOG("Error loading scene");
         return -1;
     }

@@ -1081,7 +1081,7 @@ int main(int argc, char** argv)
 {
     std::string renderer = "Neural Radiance Caching";
 
-    std::string currentScene = "C:/Users/Projects/HairMSNN/scenes/curly/config.json";
+    std::string currentScene = "E:\\code\\HairMSNN\\scenes\\curly\\config.json";
     if (argc >= 2)
         currentScene = std::string(argv[1]);
 

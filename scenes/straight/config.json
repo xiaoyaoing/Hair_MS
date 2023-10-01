@@ -25,22 +25,25 @@
             0.1,
             0.2
         ],
-        "geometry": "C:/Users/Projects/HairMSNN/scenes/straight/wstraight.hair"
+        "geometry": "E:/code/HairMSNN/scenes/straight/wstraight.hair"
     },
+    "hair_color": "E:\\code\\HairMSNN\\scenes\\envmaps\\images.jpg",
     "integrator": {
         "ENV_PDF": true,
         "MIS": true,
         "height": 1024,
-        "image_output": "C:/Users/Projects/HairMSNN/scenes/straight/render.png",
+        "image_output": "E:/code/HairMSNN/scenes/straight/render.png",
         "path_v1": 1,
         "path_v2": 40,
         "spp": 500,
-        "stats_output": "C:/Users/Projects/HairMSNN/scenes/straight/stats.json",
+        "stats_output": "E:/code/HairMSNN/scenes/straight/stats.json",
         "width": 1024
     },
+    "hairColor": "E:\\graphs\\dataset\\staircase\\albedo_d.png",
+
     "lights": {
         "environment": {
-            "exr": "C:/Users/Projects/HairMSNN/scenes/envmaps/christmas_photo_studio_07_4k.exr",
+            "exr": "E:\\code\\HairMSNN\\scenes\\envmaps\\christmas_photo_studio_07_4k.exr",
             "scale": 1.0
         },
         "directional": [
@@ -51,10 +54,10 @@
         ]
     },
     "tcnn": {
-        "config": "C:/Users/Projects/HairMSNN/scenes/straight/tcnn_hairmsnn.json",
+        "config": "E:/code/HairMSNN/scenes/straight/tcnn_hairmsnn.json",
         "init_train": true
     },
     "surface": {
-        "geometry": "C:/Users/Projects/HairMSNN/scenes/straight/head.obj"
+        "geometry": "E:/code/HairMSNN/scenes/straight/head.obj"
     }
 }

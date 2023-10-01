@@ -208,7 +208,9 @@ void RenderWindowPT::initialize()
     // Hair setup (geometry and BSDF)
     // ====================================================
     OWLVarDecl hairGeomVars[] = {
-        {nullptr}
+            {"hasColorTexture", OWL_BOOL, OWL_OFFSETOF(HairData,hasColorTexture)},
+            {"color_texture", OWL_TEXTURE, OWL_OFFSETOF(HairData,color_texture)},
+            {nullptr}
     };
 
     OWLGeomType hairGeomType = owlGeomTypeCreate(context,
@@ -227,6 +229,25 @@ void RenderWindowPT::initialize()
     // ====================================================
 
     this->hairGeom = owlGeomCreate(context, hairGeomType);
+
+
+            if (currentScene.hasHairColorTexture) {
+        Texture* diffuseTexture = &currentScene.hairColorTexture;;
+        OWLTexture diffuseTextureBuffer = owlTexture2DCreate(context,
+                                                             OWL_TEXEL_FORMAT_RGBA8,
+                                                             diffuseTexture->resolution.x,
+                                                             diffuseTexture->resolution.y,
+                                                             diffuseTexture->pixel,
+                                                             OWL_TEXTURE_NEAREST,
+                                                             OWL_TEXTURE_MIRROR);
+        owlGeomSetTexture(hairGeom, "color_texture", diffuseTextureBuffer);
+        owlGeomSet1b(hairGeom, "hasColorTexture", true);
+    }
+    else {
+//        owlGeomSet3f(triangleGeom, "diffuse", owl3f{ mesh->diffuse.x, mesh->diffuse.y, mesh->diffuse.z });
+        owlGeomSet1b(hairGeom, "hasColorTexture", false);
+};
+
 
     if(this->currentScene.has_hair) {
         this->minBound = min(this->currentScene.hairModel.minBound, minBound);
@@ -818,9 +839,11 @@ int main(int argc, char** argv)
 {
     std::string renderer = "Path Tracing";
 
-    std::string currentScene = "C:/Users/Projects/HairMSNN/scenes/straight/config.json";
+    std::string currentScene = "E:/code/HairMSNN/scenes/straight/config.json";;
+     currentScene = "E:/code/HairMSNN/scenes/curly/config.json";;
     if (argc >= 2)
         currentScene = std::string(argv[1]);
+   // currentScene = "E:\\code\\HairMSNN\\scenes\\curly\\config.json";
 
     LOG("Loading scene " + currentScene);
 

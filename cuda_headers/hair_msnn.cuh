@@ -64,6 +64,9 @@ struct LaunchParams {
 
 	int num_total_lights;
 
+    bool shownn;
+    bool showpt;
+
 	struct {
 		vec3f pos;
 		vec3f dir_00;
@@ -114,6 +117,8 @@ struct LaunchParams {
 
 	// Debug
 	int beta;
+
+    bool useLast;
 };
 
 __constant__ LaunchParams optixLaunchParams;

@@ -180,6 +180,34 @@ bool loadEnvTexture(std::string& path, Texture *texture)
     return false;
 }
 
+bool loadOneTexture(Texture * texture,const std::string & inFileName){
+    std::string fileName = inFileName;
+    // first, fix backspaces:
+    for (auto& c : fileName)
+        if (c == '\\') c = '/';
+
+    vec2i res;
+    int   comp;
+    unsigned char* image = stbi_load(fileName.c_str(),
+                                     &res.x, &res.y, &comp, STBI_rgb_alpha);
+    int textureID = -1;
+    if (image) {
+        texture->resolution = res;
+        texture->pixel = (uint32_t*)image;
+
+        /* iw - actually, it seems that stbi loads the pictures
+            mirrored along the y axis - mirror them here */
+        for (int y = 0; y < res.y / 2; y++) {
+            uint32_t* line_y = texture->pixel + y * res.x;
+            uint32_t* mirrored_y = texture->pixel + (res.y - 1 - y) * res.x;
+            int mirror_y = res.y - 1 - y;
+            for (int x = 0; x < res.x; x++) {
+                std::swap(line_y[x], mirrored_y[x]);
+            }
+        }}
+    return true;
+}
+
 /*! load a texture (if not already loaded), and return its ID in the
     model's textures[] vector. Textures that could not get loaded
     return -1 */

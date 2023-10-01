@@ -14,6 +14,8 @@
 
 #include "optix_common.cuh"
 
+
+
 __device__
 vec3f msnnNextPathVertex(Interaction& si, LCGRand& rng)
 {
@@ -65,8 +67,12 @@ vec3f msnnNextPathVertex(Interaction& si, LCGRand& rng)
 }
 
 __device__
-vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
+vec3f msnnTrainingPath(Interaction  si, LCGRand& rng, vec3f& shortPathColor,vec3f & pos,vec3f & dir,vec3f &  tangent)
 {
+    Interaction record;
+  //  record.hit = false;
+  //  record = si;
+
     vec3f beta(1.f), betaShortPath(1.f);
     vec3f final_color(0.f);
     float indirectFactor = 1.f;
@@ -76,6 +82,7 @@ vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
     shortPathColor = final_color;
 
     int bounces = 1;
+    float count = 0;
     for (bounces = 1; bounces < optixLaunchParams.pathV2; bounces++) {
         /* ================================================
         Next vertex in the path
@@ -84,7 +91,8 @@ vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
 
         vec3f mulFac(0.f);
         mulFac = msnnNextPathVertex(si, rng);
-
+      //  if(si.hit)
+        //    record = si;
         // Update betas here
         beta = beta * mulFac;
         betaShortPath = betaShortPath * mulFac;
@@ -108,6 +116,7 @@ vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
         Russian Roulette path termination (from PBRT)
         ================================================ */
         float q = max(0.05f, 1.f - luminance(beta));
+
         float qShortPath = max(0.05f, 1.f - luminance(betaShortPath));
         float eps = lcg_randomf(rng);
 
@@ -116,8 +125,20 @@ vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
 
         if (cond1 || cond2) {
             betaShortPath = 0.f;
+         //   record = si;
         }
 
+        if(betaShortPath!=vec3f(0.f) && optixLaunchParams.useLast)
+        {
+
+            pos = (pos) * (count) / (count+1) + si.p / (count+1);
+            dir = dir * count / (count+1) + si.wo / (count+1);
+            tangent = tangent * count / (count+1) + si.n / (count+1);
+            count+=1;
+//            pos = si.p;
+//            tangent = si.n;
+//            dir = si.wo;
+        }
         if (eps < q) {
             break;
         }
@@ -127,21 +148,31 @@ vec3f msnnTrainingPath(Interaction si, LCGRand& rng, vec3f& shortPathColor)
         if(betaShortPath != vec3f(0.f))
             betaShortPath = betaShortPath / (1.f - qShortPath);
     }
-
+   // record.final_color = final_color;
     return final_color;
+    //return record;
 }
 
 __device__
-vec3f msnnPathTrace(Interaction si, LCGRand& rng, int v2Stop)
+Interaction msnnPathTrace(Interaction si, LCGRand& rng, int v2Stop,vec3f * pos,vec3f & dir,vec3f &  tangent)
 {
     vec3f beta(1.f);
     vec3f final_color(0.f);
     float indirectFactor = 1.f;
     bool isPrevHair = !si.isSurface;
 
+
+    Interaction result;
+  // *pos = vec3f(1.f);
+ //   dir = vec3f(1.f);
+    //tangent = vec3f(1.f);
+
     final_color = directLighting(optixLaunchParams, si, rng);
 
     int bounces = 1;
+    float count = 0;
+
+
     for (bounces = 1; bounces <= v2Stop; bounces++) {
         /* ================================================
         Next vertex in the path
@@ -160,6 +191,15 @@ vec3f msnnPathTrace(Interaction si, LCGRand& rng, int v2Stop)
             break;
         }
 
+        result = si;
+
+        if(optixLaunchParams.useLast)
+        {
+            *pos = (*pos) * (count) / (count+1) + si.p / (count+1);
+            dir = dir * count / (count+1) + si.wo / (count+1);
+            tangent = tangent * count / (count+1) + si.n / (count+1);
+             count+=1;
+        }
         /* ================================================
         Direct lighting
         ================================================ */
@@ -174,14 +214,22 @@ vec3f msnnPathTrace(Interaction si, LCGRand& rng, int v2Stop)
         bool cond1 = eps < q;
         bool cond2 = bounces > optixLaunchParams.beta;
 
+
+//        pos = si.p;
+//        tangent = si.n;
+//        dir = si.wo;
+
+
         if (cond1 || cond2) {
+
             break;
         }
-
         beta = beta / (1.f - q);
     }
-
-    return final_color;
+    result.color = final_color;
+    return result;
+    //return std::array<vec3f,4>() = {vec3f(0.f),vec3f(0.f),vec3f(0.f),vec3f(0.f)};
+    //return final_color;
 }
 
 OPTIX_RAYGEN_PROGRAM(rayGenCam)()
@@ -240,9 +288,21 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
         owl::traceRay(optixLaunchParams.world, ray, si);
 
         vec3f color(0.f), shortPathColor(0.f);
+      //  Interaction record;
+    //    record.hit = false;
+        vec3f pos =  si.p,dir = si.wo,tangent = si.t;
+
         if (isTrainingPixel) {
+
             if (si.hit) {
-                color = msnnTrainingPath(si, rng, shortPathColor);
+             //   color  = si.final_color;
+                color =  msnnTrainingPath(si, rng, shortPathColor,pos,dir,tangent);
+
+             //   int count = 1;
+             //   while(si.hit && count < optixLaunchParams.beta) msnnNextPathVertex(si, rng);
+
+                // color = record.final_color;
+             //   record.hit = false;
             }
 
             if (isnan(color.x) || isnan(color.y) || isnan(color.z))
@@ -257,18 +317,40 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
             if (isinf(shortPathColor.x) || isinf(shortPathColor.y) || isinf(shortPathColor.z))
                 shortPathColor = vec3f(1e5f);
 
-            vec3f point = si.p / optixLaunchParams.sceneScale;
+            vec3f point = pos / optixLaunchParams.sceneScale;
             optixLaunchParams.nnTrainInput[trOfs * inputCh + 0] = point.x;
             optixLaunchParams.nnTrainInput[trOfs * inputCh + 1] = point.y;
             optixLaunchParams.nnTrainInput[trOfs * inputCh + 2] = point.z;
 
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 3] = si.wo.x;
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 4] = si.wo.y;
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 5] = si.wo.z;
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 3] = record.hit?record.wo.x:si.wo.x;
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 4] = record.hit?record.wo.y:si.wo.y;
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 5] = record.hit?record.wo.z:si.wo.z;
+//
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 6] = record.hit?record.t.x:si.t.x;
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 7] = record.hit?record.t.y:si.t.y;
+//            optixLaunchParams.nnTrainInput[trOfs * inputCh + 8] = record.hit?record.t.z:si.t.z;
+//
+//            optixLaunchParams.nnTrainOutput[trOfs * outputCh + 0] = color.x - shortPathColor.x;
+//            optixLaunchParams.nnTrainOutput[trOfs * outputCh + 1] = color.y - shortPathColor.y;
+//            optixLaunchParams.nnTrainOutput[trOfs * outputCh + 2] = color.z - shortPathColor.z;
+            if(inputCh>3) {
 
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 6] = si.t.x;
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 7] = si.t.y;
-            optixLaunchParams.nnTrainInput[trOfs * inputCh + 8] = si.t.z;
+                optixLaunchParams.nnTrainInput[trOfs * inputCh + 3] = point.x;
+                optixLaunchParams.nnTrainInput[trOfs * inputCh + 4] = point.y;
+                optixLaunchParams.nnTrainInput[trOfs * inputCh + 5] = point.z;
+
+            }
+
+            if(inputCh>6)
+            {optixLaunchParams.nnTrainInput[trOfs * inputCh + 6] = point.x;
+            optixLaunchParams.nnTrainInput[trOfs * inputCh + 7] = point.y;
+            optixLaunchParams.nnTrainInput[trOfs * inputCh + 8] = point.z;}
+
+            if(inputCh>9) {
+                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 9] = vec3f(1.f,1.f,1.f).x;
+                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 10] = vec3f(1.f,1.f,1.f).vy;
+                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 11] = vec3f(1.f,1.f,1.f).z;
+            }
 
             optixLaunchParams.nnTrainOutput[trOfs * outputCh + 0] = color.x - shortPathColor.x;
             optixLaunchParams.nnTrainOutput[trOfs * outputCh + 1] = color.y - shortPathColor.y;
@@ -283,29 +365,48 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
                 color = si.Le;
             }
             else if (si.hit) {
-                color = msnnPathTrace(si, rng, pathV2);
+              //  auto t = pos;
+              auto t =   msnnPathTrace(si, rng, pathV2,&pos,dir,tangent);
+              color = t.color;
+//              if(optixLaunchParams.useLast)
+//              {
+//                  pos = t.p;
+//                  dir = t.wo;
+//                  tangent = t.t;
+//              }
+               // pos =  t;
             }
         }
 
         if (optixLaunchParams.pass == G_BUFFER) {
-            vec3f point = si.p / optixLaunchParams.sceneScale;
+            vec3f point = pos / optixLaunchParams.sceneScale;
 
             optixLaunchParams.nnFrameInput[fbOfs * inputCh + 0] = point.x;
             optixLaunchParams.nnFrameInput[fbOfs * inputCh + 1] = point.y;
             optixLaunchParams.nnFrameInput[fbOfs * inputCh + 2] = point.z;
 
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 3] = si.wo.x;
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 4] = si.wo.y;
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 5] = si.wo.z;
+            if(inputCh>3){
+                optixLaunchParams.nnFrameInput[fbOfs * inputCh + 3] = point.x;
+            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 4] = point.y;
+            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 5] = point.z;}
 
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 6] = si.t.x;
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 7] = si.t.y;
-            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 8] = si.t.z;
+            if(inputCh>6)
+            {
+                optixLaunchParams.nnFrameInput[fbOfs * inputCh + 6] = point.x;
+            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 7] = point.y;
+            optixLaunchParams.nnFrameInput[fbOfs * inputCh + 8] = point.z;
+            }
+
+            if(inputCh>9){
+                optixLaunchParams.nnFrameInput[fbOfs * inputCh + 9] = vec3f(1.f,1.f,1.f).x;
+                optixLaunchParams.nnFrameInput[fbOfs * inputCh + 10] = vec3f(1.f,1.f,1.f).y;
+                optixLaunchParams.nnFrameInput[fbOfs * inputCh + 11] = vec3f(1.f,1.f,1.f).z;
+            }
 
             GBuffer buf;
             buf.hit = si.hit;
             buf.isSurface = si.isSurface;
-            buf.p = si.p;
+            buf.p = pos;
             buf.shortPathColor = color;
 
             optixLaunchParams.gBuffer[fbOfs] = buf;
@@ -328,7 +429,11 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
             nnOutput = color;
         }
         else {
-            color = gBuffer.shortPathColor + nnOutput;
+            color = vec3f(0.f);
+            if(optixLaunchParams.shownn) color+=nnOutput;
+            if(optixLaunchParams.showpt) color+=gBuffer.shortPathColor;
+          //  color =nnOutput;
+            //color =   nnOutput + gBuffer.shortPathColor;
         }
 
         // Write final color

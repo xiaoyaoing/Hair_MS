@@ -7,5 +7,6 @@ Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
+# map_Kd E:\graphs\dataset\bathroom3\albedo_d.png
 d 1.000000
 illum 2

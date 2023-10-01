@@ -58,8 +58,10 @@ struct Interaction {
 
 	vec3f to_local[3], to_world[3];
 
+   // vec3f final_color = vec3f (0.f);
 	// General interaction
 	vec3f color = vec3f(0.f);
+    vec3f hair_color = vec3f(1.f);
 	float alpha = 0.f;
 	float beta_m = 0.f, beta_n = 0.f;
 
@@ -95,7 +97,8 @@ struct MultiScatterRayData {
 };
 
 struct HairData {
-	
+	bool hasColorTexture;
+    cudaTextureObject_t color_texture;
 };
 
 struct TriangleMeshData {

@@ -216,12 +216,16 @@ __forceinline__ vec3f curveTangent(const CurveType& bc, float u)
 /*! compute normal - stolen from optixHair sample in OptiX 7.4 SDK */
 // Compute surface normal of quadratic pimitive in world space.
 static __forceinline__ __device__
-void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3f& t, vec3f& c, float& radius)
+void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3f& t, vec3f& c, float& radius,vec2f & uv)
 {
     const OptixTraversableHandle gas = optixGetGASTraversableHandle();
     const unsigned int           gasSbtIndex = optixGetSbtGASIndex();
 
     float u = optixGetCurveParameter();
+
+    uv.x = primitiveIndex / 10000.f- int(primitiveIndex/10000.f);
+    uv.y = u;
+  //  printf("%f ",u);
 
 #define CURVE_CATMULL_ROM
 #ifdef CURVE_CATMULL_ROM

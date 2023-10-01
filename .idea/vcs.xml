@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/cyCodeBase" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/json" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/owl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tiny-cuda-nn" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tiny-cuda-nn/dependencies/cutlass" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tiny-cuda-nn/dependencies/fmt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tinyexr" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tinyexr/deps/ZFP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/extern/tinyobjloader" vcs="Git" />
+  </component>
+</project>

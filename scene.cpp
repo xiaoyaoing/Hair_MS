@@ -230,6 +230,10 @@ bool parseScene(std::string sceneFile, Scene& scene)
         LOG("Hair material not defined. Using default values...");
     }
 
+    if(sceneConfig.contains("hair_color")){
+        scene.hasHairColorTexture = true;
+        loadOneTexture(&scene.hairColorTexture,sceneConfig["hair_color"]);
+    }
     // ====================================
     // Load enviroinment light, if present
     // ====================================

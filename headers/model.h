@@ -97,6 +97,7 @@ struct HairModel {
 
 Model* loadOBJ(const std::string& objFile);
 bool loadEnvTexture(std::string& path, Texture* texture);
+bool loadOneTexture(Texture * texture,const std::string & inFileName);
 
 int saveBufferAsEXR(std::string path, float* hostBuffer, int width, int height, int numComponents);
 float* loadBufferFromEXR(std::string path, int* width, int* height, int numComponents);

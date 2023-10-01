@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.18)
-set(CMAKE_BUILD_TYPE Release)
+
+set(CudaToolkitDir "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1")
+set(CUDAToolkit_ROOT "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1")
+set(CMAKE_CUDA_COMPILER "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe")
+set(OptiX_ROOT_DIR "C:/ProgramData/NVIDIA Corporation/OptiX SDK 7.4.0/")
+
 
 project(HairMSNN 
   VERSION 1.0 
   LANGUAGES C CXX CUDA
 )
 
-set(OptiX_ROOT_DIR "C:/ProgramData/NVIDIA Corporation/OptiX SDK 7.4.0/")
 
 if (APPLE)
 	set(CMAKE_MACOSX_RPATH ON)
@@ -148,6 +152,10 @@ endif()
 
 add_library(tiny-cuda-nn STATIC ${TCNN_SOURCES})
 target_compile_definitions(tiny-cuda-nn PUBLIC ${TCNN_DEFINITIONS})
+
+## 为tiny-cuda-nn库添加/bigobj编译选项
+#target_compile_options(tiny-cuda-nn PUBLIC "/bigobj")
+
 target_compile_options(tiny-cuda-nn PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:${CUDA_NVCC_FLAGS}>)
 target_include_directories(tiny-cuda-nn PUBLIC
 	"extern/tiny-cuda-nn/include/"

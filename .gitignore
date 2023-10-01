@@ -5,6 +5,8 @@ tiny_cuda_nn/
 scenes/obj_files/zero_day/
 scenes/obj_files/living_room/
 precomputation/sampled*
+cmake*/
+
 
 # Prerequisites
 *.d

@@ -28,7 +28,7 @@
                 "n_levels": 16
             },
             {
-                "n_dims_to_encode": 6,
+                "n_dims_to_encode": 0,
                 "otype": "OneBlob",
                 "n_bins": 4
             },

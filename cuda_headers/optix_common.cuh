@@ -23,6 +23,17 @@ vec3f getEnvironmentRadiance(LaunchParams &params, vec3f dir)
     return rval;
 }
 
+struct Photon{
+    vec3f  dir;
+    vec3f  pos;
+    vec3f  radiance;
+};
+
+__device__ void tracePhoton(LaunchParams& params){
+
+
+}
+
 __device__
 float getEnvironmentPdf(LaunchParams& params, vec3f wi)
 {
@@ -566,7 +577,8 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
         si.n,
         si.t,
         si.hair.curve_p,
-        si.hair.radius);
+        si.hair.radius,
+        si.uv);
 
     vec3f X = si.t;
     vec3f Y = normalize(cross(si.wo, X));
@@ -583,6 +595,25 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
     si.wo_local = normalize(apply_mat(si.to_local, si.wo));
 
     si.color = optixLaunchParams.hairData.sig_a;
+    if(self.hasColorTexture)
+    si.color =  tex2D<float4>(self.color_texture,si.uv.x,si.uv.y);
+   // si.color = vec3f(1.f-si.color.x,1.f-si.color.y,1.f-si.color.z);
+    float scale = 0.2f;
+   // si.color = tex2D<float4>(optixLaunchParams.env,si.uv.x,si.uv.y);
+
+    si.color = vec3f(si.color.x * scale,si.color.y * scale,si.color.z * scale);
+    // si.color = vec3f(1-si.color.x)
+  //  si.color = vec3f(si.uv.x,si.uv.y,0);
+
+    //printf("%f %f %f",si.color.x,si.color.y,si.color.z);
+//    printf("%f %f \n",si.uv.x,si.uv.y);
+    si.color = vec3f(si.uv.x,si.uv.y,0);
+
+    si.color = vec3f(abs(si.wo.x),abs(si.wo.y),abs(si.wo.z));
+
+    si.color = optixLaunchParams.hairData.sig_a;
+
+
     si.beta_m = optixLaunchParams.hairData.beta_m;
     si.beta_n = optixLaunchParams.hairData.beta_n;
     si.alpha = optixLaunchParams.hairData.alpha;

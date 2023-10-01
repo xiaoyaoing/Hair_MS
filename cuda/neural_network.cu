@@ -79,20 +79,27 @@ void getBatch(float* batchInput, float* batchOutput,
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 0] = inputBuffer[dataIdx * dataInputCh + 0];
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 1] = inputBuffer[dataIdx * dataInputCh + 1];
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 2] = inputBuffer[dataIdx * dataInputCh + 2];
-    
-    batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 3] = inputBuffer[dataIdx * dataInputCh + 3];
-    batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 4] = inputBuffer[dataIdx * dataInputCh + 4];
-    batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 5] = inputBuffer[dataIdx * dataInputCh + 5];
-    
-    // Normal
+
+
+    if(mlpInputCh>3) {
+        batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 3] = inputBuffer[
+                dataIdx * dataInputCh + 3];
+        batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 4] = inputBuffer[
+                dataIdx * dataInputCh + 4];
+        batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 5] = inputBuffer[
+                dataIdx * dataInputCh + 5];
+    }
+            // Normal
     // batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 6] = inputBuffer[dataIdx * dataInputCh + 6];
     // batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 7] = inputBuffer[dataIdx * dataInputCh + 7];
     // batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 8] = inputBuffer[dataIdx * dataInputCh + 8];
 
     // Tangent
+    if(mlpInputCh>6){
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 6] = inputBuffer[dataIdx * dataInputCh + 9];
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 7] = inputBuffer[dataIdx * dataInputCh + 10];
     batchInput[blockDim.x * blockIdx.x * mlpInputCh + threadIdx.x * mlpInputCh + 8] = inputBuffer[dataIdx * dataInputCh + 11];
+    }
     
     // Output
     batchOutput[blockDim.x * blockIdx.x * mlpOutputCh + threadIdx.x * mlpOutputCh + 0] = outputBuffer[dataIdx * dataOutputCh + 0];
