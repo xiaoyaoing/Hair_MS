@@ -24,7 +24,7 @@
         "beta_n": 0.2,
         "type": 1,
         "sigma_a": [
-            0.01,0.01,0.01
+            0.06, 0.1, 0.2
         ],
         "geometry": "E:/code/HairMSNN/scenes/curly/wCurly.hair"
     },
@@ -33,9 +33,9 @@
         "MIS": true,
         "height": 1024,
         "image_output": "E:/code/HairMSNN/scenes/curly/render.png",
-        "path_v1": 4,
-        "path_v2": 40,
-        "spp": 512,
+        "path_v1": 0,
+        "path_v2": 13,
+        "spp": 100,
         "stats_output": "E:/code/HairMSNN/scenes/curly/stats.json",
         "width": 1024
     },

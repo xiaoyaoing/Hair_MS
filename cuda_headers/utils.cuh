@@ -29,6 +29,7 @@ void writePixel(vec3f& color, int accumId,
     color = (1.f / (accumId + 1)) * color;
 
     averageBuffer[offset] = vec4f(color, 1.0);
+    if(frameBuffer)
     frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(color.x),
         linear_to_srgb(color.y),
         linear_to_srgb(color.z)));

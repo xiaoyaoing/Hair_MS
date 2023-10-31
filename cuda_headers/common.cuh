@@ -32,6 +32,7 @@ typedef RayT<MULTISCATTER_RAY_TYPE, NUM_RAY_TYPES> MultiScatterRay;
 #endif
 
 struct HairInteraction {
+    int curvePrimIndex = 0;
 	float R_G = 1.f, TT_G = 1.f, TRT_G = 1.f, TRRT_G = 1.f;
 
 	vec3f curve_p = vec3f(0.f);

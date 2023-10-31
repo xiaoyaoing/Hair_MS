@@ -56,7 +56,8 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
     if (si.hit == false)
         color = si.Le;
     else {
-        color = pathTrace(si, rng, v1Stop, v2Stop);
+        color = pathTrace(si, rng, v1Stop, v2Stop,fbOfs);
+       // color = (si.wi + 1.f)/2.f;
     }
     
     writePixel(color, optixLaunchParams.accumId,

@@ -147,5 +147,7 @@ struct RenderWindow_HairMSNN : public owl::viewer::OWLViewer
     float trainingLoss = 0.f;
     int mlpInputCh = 9, mlpOutputCh = 3;
 
+    int numOfNeigh = 4;
+
     float trainTime = 0.f, inferTime = 0.f, renderTime = 0.f;
 };

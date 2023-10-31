@@ -204,6 +204,13 @@ vec3f disney_hair(Interaction si, float* pdf) {
 
     // Compute $\gammat$ for refracted ray
     float h = dot(si.to_local[1], si.n);
+    h = dot(normalize(cross(si.t,si.wo)),si.n);
+   // vec3f wop(0.f, wo.y, wo.z);
+   // wop = normalize(wop);
+   // float cosGammaO = dot(wop, n);
+  //  float gammaO = acos(cosGammaO);
+  //  float h = sin(acos(dot(wop, n)));
+
     float gammaO = asin(h);
     float cosGammaO = cos(gammaO);
 
@@ -261,7 +268,7 @@ vec3f disney_hair(Interaction si, float* pdf) {
     (*pdf) = (*pdf) + Mp1 * apPdf[1] * Np1;
     (*pdf) = (*pdf) + Mp2 * apPdf[2] * Np2;
     (*pdf) = (*pdf) + MpMax * apPdf[3] * NpMax;
-
+    //return Mp0 * Ap0(fresnel, T) * Np0;
     return f;
 }
 
@@ -285,12 +292,12 @@ vec3f sample_disney_hair(Interaction& si, vec4f& rand, float *pdf) {
     float phiO = atan2(wo.z, wo.y);
 
     // Compute $\gammat$ for refracted ray
-    // vec3f wop(0.f, wo.y, wo.z);
-    // wop = normalize(wop);
-    // float cosGammaO = dot(wop, n);
-    // float gammaO = acos(cosGammaO);
-    // float h = sin(gammaO);
+   // vec3f wop(0.f, wo.y, wo.z);
+  //  wop = normalize(wop);
+  //  float h = sin(acos(dot(wop, n)));
     float h = dot(si.to_local[1], si.n);
+    h = dot(normalize(cross(si.t,si.wo)),si.n);
+
     float gammaO = asin(h);
     float cosGammaO = cos(gammaO);
 
@@ -322,6 +329,8 @@ vec3f sample_disney_hair(Interaction& si, vec4f& rand, float *pdf) {
         sinThetaOp = sinThetaO;
         cosThetaOp = cosThetaO;
     }
+
+
 
     // Sample $M_p$ to compute $\thetai$
     float eps2 = owl::max(rand.y, 1e-5f);

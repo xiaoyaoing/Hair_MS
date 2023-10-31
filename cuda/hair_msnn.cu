@@ -347,9 +347,9 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
             optixLaunchParams.nnTrainInput[trOfs * inputCh + 8] = point.z;}
 
             if(inputCh>9) {
-                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 9] = vec3f(1.f,1.f,1.f).x;
-                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 10] = vec3f(1.f,1.f,1.f).vy;
-                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 11] = vec3f(1.f,1.f,1.f).z;
+//                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 9] = vec3f(1.f,1.f,1.f).x;
+//                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 10] = vec3f(1.f,1.f,1.f).vy;
+//                optixLaunchParams.nnTrainInput[fbOfs * inputCh + 11] = vec3f(1.f,1.f,1.f).z;
             }
 
             optixLaunchParams.nnTrainOutput[trOfs * outputCh + 0] = color.x - shortPathColor.x;

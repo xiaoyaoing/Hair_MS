@@ -12,6 +12,17 @@
 struct LaunchParams {
 	float4* accumBuffer;
 	float4* averageBuffer;
+
+	float4* buffer0;
+	float4* buffer1;
+	float4* buffer2;
+	float4* buffer3;
+	float4* buffer4;
+	float4* buffer5;
+	float4* buffer6;
+    bool recordBuffer;
+
+
 	int accumId;
 
 	OptixTraversableHandle world;

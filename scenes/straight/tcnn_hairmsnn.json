@@ -26,14 +26,6 @@
                 "log2_hashmap_size": 15,
                 "base_resolution": 16,
                 "n_levels": 16
-            },
-            {
-                "n_dims_to_encode": 0,
-                "otype": "OneBlob",
-                "n_bins": 4
-            },
-            {
-                "otype": "Identity"
             }
         ]
     },

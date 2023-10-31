@@ -27,6 +27,20 @@ void RenderWindowPT::initialize()
     cudaMalloc(&this->accumBuffer, frameSize * sizeof(float4));
     cudaMalloc(&this->averageBuffer, frameSize * sizeof(float4));
 
+    if(recordBuffer)
+    {cudaMalloc(&this->buffer0, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer1, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer2, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer3, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer4, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer5, frameSize * sizeof(float4));
+    cudaMalloc(&this->buffer6, frameSize * sizeof(float4));}
+
+
+
+
+
+
     // ====================================================
     // Environment lights setup
     // ====================================================
@@ -319,6 +333,18 @@ void RenderWindowPT::initialize()
         // All other parameters
         {"accumBuffer", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, accumBuffer)},
         {"averageBuffer", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, averageBuffer)},
+
+
+        {"buffer0", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer0)},
+        {"buffer1", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer1)},
+        {"buffer2", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer2)},
+        {"buffer3", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer3)},
+        {"buffer4", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer4)},
+        {"buffer5", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer5)},
+        {"buffer6", OWL_RAW_POINTER, OWL_OFFSETOF(LaunchParams, buffer6)},
+        {"recordBuffer", OWL_BOOL, OWL_OFFSETOF(LaunchParams, recordBuffer)},
+
+
         {"accumId", OWL_INT, OWL_OFFSETOF(LaunchParams, accumId)},
         {"world", OWL_GROUP, OWL_OFFSETOF(LaunchParams, world)},
         {"camera.pos", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, camera.pos)},
@@ -436,7 +462,32 @@ long long RenderWindowPT::render()
         owlLaunch2D(this->rayGen, this->fbSize.x, this->fbSize.y, this->launchParams);
 
         accumId++;
+
+        if(accumId == currentScene.spp && false)
+        {
+            auto file = stringFormat("sigma=%f%f%f %d %d.exr",currentScene.sig_a.x,currentScene.sig_a.y,currentScene.sig_a.z,currentScene.path_v1,currentScene.path_v2);
+            screenShotEXR(file);
+
+            if(currentV1<=10) {
+                currentV1 += 1;
+
+                this->currentScene.path_v1 = currentV1;
+                this->currentScene.path_v2 = currentV1 + 2;
+
+                if(currentV1 == 11){
+                    this->currentScene.path_v1 = 0;
+                }
+
+                owlParamsSet1i(this->launchParams, "pathV1", currentScene.path_v1);
+                owlParamsSet1i(this->launchParams, "pathV2", currentScene.path_v2);
+
+                this->cameraChanged();
+            }
+
+
+            }
     }
+
 
     auto finish = std::chrono::high_resolution_clock::now();
 
@@ -681,12 +732,42 @@ void RenderWindowPT::screenShotEXR(std::string fname)
     float* hostBuffer = (float*)malloc(bufferSize);
     cudaMemcpy(hostBuffer, this->averageBuffer, bufferSize, cudaMemcpyDeviceToHost);
     saveEXR(fname, hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+
+    std::string filename[] = {"pt0.exr","pt1.exr","pt2.exr","pt3.exr","pt4.exr","pt5.exr","pt6.exr"};
+
+    // 替换 0 为 1-6 生成的代码
+    if(recordBuffer)
+    {
+        cudaMemcpy(hostBuffer, this->buffer0, bufferSize, cudaMemcpyDeviceToHost);
+        saveEXR(filename[0], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+        cudaMemcpy(hostBuffer, this->buffer1, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[1], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+    cudaMemcpy(hostBuffer, this->buffer2, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[2], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+    cudaMemcpy(hostBuffer, this->buffer3, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[3], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+    cudaMemcpy(hostBuffer, this->buffer4, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[4], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+    cudaMemcpy(hostBuffer, this->buffer5, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[5], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);
+    cudaMemcpy(hostBuffer, this->buffer6, bufferSize, cudaMemcpyDeviceToHost);
+    saveEXR(filename[6], hostBuffer, this->accumId, this->fbSize.x, this->fbSize.y);}
+
+
+
     free(hostBuffer);
+}
+
+
+void RenderWindowPT::exrSaveHelper(int x, float4 *hostBuffer) {
+
+
 }
 
 RenderWindowPT::RenderWindowPT(Scene& scene, vec2i resolution, bool interactive)
     : owl::viewer::OWLViewer("Real-time hair", resolution, interactive, false)
 {
+    recordBuffer = false;
     this->currentScene = scene;
 
     this->camera.setOrientation(scene.camera.from,

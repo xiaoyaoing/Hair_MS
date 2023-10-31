@@ -44,6 +44,8 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     void customKey(char key, const vec2i& pos) override;
     void screenShotEXR(std::string fname);
 
+    void exrSaveHelper(int x,float4 *hostBuffer);
+
     vec3f getSceneCg();
 
     void uploadLights();
@@ -52,7 +54,7 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     OWLModule module{ 0 };
 
     bool sbtDirty = true;
-    bool progressive = true;
+    bool progressive = false;
 
     OWLRayGen rayGen{ 0 };
     OWLMissProg missProg{ 0 };
@@ -94,4 +96,15 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     float4* denoiserAlbedoInput;
     float4* denoiserNormalInput;
     float* denoiserIntensity;
+
+    float4* buffer0{ 0 };
+    float4* buffer1{ 0 };
+    float4* buffer2{ 0 };
+    float4* buffer3{ 0 };
+    float4* buffer4{ 0 };
+    float4* buffer5{ 0 };
+    float4* buffer6{ 0 };
+    bool recordBuffer = true;
+
+    int currentV1 =0;
 };

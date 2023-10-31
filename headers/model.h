@@ -103,3 +103,14 @@ int saveBufferAsEXR(std::string path, float* hostBuffer, int width, int height, 
 float* loadBufferFromEXR(std::string path, int* width, int* height, int numComponents);
 
 int saveEXR(std::string path, float* hostBuffer, int accumId, int width, int height);
+
+template<typename ... Args>
+std::string stringFormat( const char * format, Args ... args )
+{
+    int size_s = std::snprintf( nullptr, 0, format, args ... ) + 1;
+    if( size_s <= 0 ){ throw std::runtime_error( "Error during formatting." ); }
+    auto size = static_cast<size_t>( size_s );
+    std::unique_ptr<char[]> buf( new char[ size ] );
+    std::snprintf( buf.get(), size, format, args ... );
+    return std::string( buf.get(), buf.get() + size - 1 );
+}

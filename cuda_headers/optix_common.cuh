@@ -12,7 +12,7 @@ vec3f getEnvironmentRadiance(LaunchParams &params, vec3f dir)
 {
     float theta = sphericalTheta(dir);
     float phi = sphericalPhi(dir) + params.envRotPhi;
-
+     
     if (phi > TWO_Pi)
         phi = phi - TWO_Pi;
 
@@ -24,13 +24,146 @@ vec3f getEnvironmentRadiance(LaunchParams &params, vec3f dir)
 }
 
 struct Photon{
-    vec3f  dir;
-    vec3f  pos;
-    vec3f  radiance;
+    vec3f  dir{};
+    vec3f  pos{};
+    vec3f  radiance{};
 };
 
-__device__ void tracePhoton(LaunchParams& params){
+// __device__  void coordinateSystem(const vec3f &a, vec3f  &b, vec3f  &c) {
+// //    if (std::abs(a.x) > std::abs(a.y)) {
+// //        float invLen = 1.0f / sqrt(a.x * a.x + a.z * a.z);
+// //        c = vec3f (a.z * invLen, 0.0f, -a.x * invLen);
+// //    } else {
+// //        float invLen = 1.0f / sqrt(a.y * a.y + a.z * a.z);
+// //        c = vec3f(0.0f, a.z * invLen, -a.y * invLen);
+// //    }
+// //    vec3f  _a(a.x,a.y,a.z);
+// //    b = cross(_a,c);
+// }
 
+__device__ Photon tracePhoton(LaunchParams& params,LCGRand& rng){
+
+//    Photon photon;
+//
+//    vec3f rval(0.f);
+//
+//    if (params.envPdfSampling) {
+//
+//        float dirPdf,posPdf;
+//
+//        auto lower_bound = [](float u, cudaTextureObject_t cdf, float y, float size) {
+//            // This is basically std::lower_bound as used by PBRT
+//            int first = 0;
+//            int count = size;
+//            while (count > 0)
+//            {
+//                int step = count >> 1;
+//                int middle = first + step;
+//                if (tex2D<float>(cdf, middle / size, y) < u)
+//                {
+//                    first = middle + 1;
+//                    count -= step + 1;
+//                }
+//                else
+//                    count = step;
+//            }
+//            return max(0, first - 1);
+//        };
+//
+//        vec2f u01 = vec2f(lcg_randomf(rng), lcg_randomf(rng));
+//
+//        float width = (float)params.envWidth;
+//        float height = (float)params.envHeight;
+//
+//        int index_v = lower_bound(u01.y, params.marginalCdf, 0.f, height);
+//
+//        float cdf_v = tex2D<float>(params.marginalCdf, index_v / height, 0.f);
+//        float cdf_next_v = tex2D<float>(params.marginalCdf, (index_v + 1) / height, 0.f);
+//        float cdf_last_v = tex2D<float>(params.marginalCdf, 1.f, 0.f);
+//
+//        // Importance-sampled v direction
+//        float dv = (cdf_next_v - u01.y) / (cdf_next_v - cdf_v);
+//        float v = (index_v + dv) / height;
+//
+//        int cdf_width = width + 1;
+//        int index_u = lower_bound(u01.x, params.conditionalCdf, index_v / height, width);
+//
+//        float cdf_u = tex2D<float>(params.conditionalCdf, index_u / width, index_v / height);
+//        float cdf_next_u = tex2D<float>(params.conditionalCdf, (index_u + 1) / width, index_v / height);
+//        float cdf_last_u = tex2D<float>(params.conditionalCdf, 1.f, index_v / height);
+//
+//        // Importance-sampled u direction
+//        float du = (cdf_next_u - u01.x) / (cdf_next_u - cdf_u);
+//        float u = (index_u + du) / width;
+//
+//        rval = params.envScale * (vec3f)tex2D<float4>(params.env, u, v);
+//
+//        // Compute pdf
+//        cdf_last_u = tex2D<float>(params.conditionalPdf, 1.f, index_v / height);
+//        cdf_last_v = tex2D<float>(params.marginalPdf, 1.f, 0.f);
+//
+//        cdf_u = tex2D<float>(params.conditionalPdf, index_u / width, index_v / height);
+//        cdf_v = tex2D<float>(params.marginalPdf, index_v / height, 0.f);
+//
+//        float theta = Pi * v;
+//        float sin_theta = sinf(theta);
+//        float denom = (2.f * Pi * Pi * sin_theta) * cdf_last_u * cdf_last_v;
+//        dirPdf = denom ? (cdf_u * cdf_v) / denom : 0.f;
+//
+//        // Compute direction
+//        float phi = 2.f * Pi * u - params.envRotPhi;
+//        if (phi < 0)
+//            phi = TWO_Pi + phi;
+//
+//        //todo load this from scene
+//        vec3f worldCenter(0.f,0.f,0.f);
+//        float worldRadius{100.f};
+//        posPdf = 4 * Pi * worldRadius * worldRadius;
+//
+//        photon.radiance = rval / posPdf / dirPdf;
+//        photon.dir = sin_theta * cosf(phi), sin_theta * sinf(phi), cosf(theta);
+//
+//
+//        //sample photon position
+//        vec3f v1,v2;
+//        coordinateSystem(photon.dir,v1,v2);
+//
+//        vec2f cd;
+//        vec2f u = vec2f(lcg_randomf(rng), lcg_randomf(rng));
+//
+//        vec2f uOffset = 2.f * u - vec2f(1, 1);
+//
+//        // Handle degeneracy at the origin
+//        if ( uOffset.x == 0 && uOffset.y == 0 ) cd  = vec2f(0.f, 0.f);
+//
+//        else {
+//            float  theta, r;
+//            if ( std::abs(uOffset.x) > std::abs(uOffset.y) ) {
+//                r = uOffset.x;
+//                theta = Pi /4.f * ( uOffset.y / uOffset.x );
+//            } else {
+//                r = uOffset.y;
+//                theta =Pi /2.f  - Pi /4.f  * ( uOffset.x / uOffset.y );
+//            }
+//            cd =  r * vec2f(std::cos(theta), std::sin(theta));
+//        }
+//
+//
+//
+//
+//        photon.pos =worldCenter + (cd.x * v1+cd.y * v2) * worldRadius + worldRadius * photon.dir;
+//
+//    }
+//    else {
+//        vec2f u01 = vec2f(lcg_randomf(rng), lcg_randomf(rng));
+//        si.wi = uniformSampleSphere(u01);
+//        si.wi_local = normalize(apply_mat(si.to_local, si.wi));
+//
+//        *pdf = 1.f / (4.f * Pi);
+//        rval = getEnvironmentRadiance(params, si.wi);
+//    }
+//
+//    return rval;
 
 }
 
@@ -371,16 +504,27 @@ vec3f nextPathVertex(LaunchParams& params, Interaction& si, LCGRand& rng, vec3f&
 }
 
 __device__
-vec3f pathTrace(Interaction si, LCGRand& rng, int v1Stop, int v2Stop)
+vec3f pathTrace(Interaction si, LCGRand& rng, int v1Stop, int v2Stop,int fbOfs)
 {
     if (v2Stop < v1Stop)
         return vec3f(0.f);
-
     vec3f beta(1.f);
     vec3f final_color(0.f);
 
-    if (v1Stop == 0)
-        final_color = directLighting(optixLaunchParams, si, rng);
+    if(v1Stop ==0){
+        vec3f directL =  directLighting(optixLaunchParams, si, rng);
+        if (v1Stop == 0)
+            final_color = directL;
+//        if(optixLaunchParams.recordBuffer)
+//            writePixel(directL, optixLaunchParams.accumId,
+//                       nullptr,
+//                       optixLaunchParams.accumBuffer,
+//                       optixLaunchParams.buffer0,
+//                       fbOfs);
+    }
+
+
+
 
     int bounces = 1;
     for (bounces = 1; bounces <= v2Stop; bounces++) {
@@ -389,6 +533,9 @@ vec3f pathTrace(Interaction si, LCGRand& rng, int v1Stop, int v2Stop)
         ================================================ */
         nextPathVertex(optixLaunchParams, si, rng, beta);
 
+       // return beta;
+       // return si.n;
+
         /* ================================================
         Terminate if escaped
         ================================================ */
@@ -396,12 +543,19 @@ vec3f pathTrace(Interaction si, LCGRand& rng, int v1Stop, int v2Stop)
             break;
         }
 
+
+
         /* ================================================
         Direct lighting
         ================================================ */
         if (bounces >= v1Stop) {
-            final_color += beta * directLighting(optixLaunchParams, si, rng);
+            auto directL = beta * directLighting(optixLaunchParams, si, rng);
+            if (bounces >= v1Stop)
+                final_color = directL;
+
+
         }
+
 
         /* ================================================
         Russian Roulette path termination (from PBRT)
@@ -415,7 +569,6 @@ vec3f pathTrace(Interaction si, LCGRand& rng, int v1Stop, int v2Stop)
         
         beta = beta / (1.f - q);
     }
-
     return final_color;
 }
 
@@ -566,23 +719,35 @@ OPTIX_CLOSEST_HIT_PROGRAM(triangleMeshCH)()
     si.isSurface = true;
 }
 
+// https://graphics.pixar.com/library/OrthonormalB/paper.pdf
+static __forceinline__ __device__  void BuildONB(vec3f N, vec3f &b1, vec3f &b2) noexcept {
+    float sign = copysignf(1.f, N.z);
+    float a = -1.f / (sign + N.z);
+    float b = N.x * N.y * a;
+    b1 = vec3f(1.f + sign * N.x * N.x * a, sign * b, -sign * N.x);
+    b2 = vec3f(b, sign + N.y * N.y * a, -N.y);
+}
+
 OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
 {
     const HairData& self = owl::getProgramData<HairData>();
     Interaction& si = owl::getPRD<Interaction>();
 
     unsigned int primIdx = optixGetPrimitiveIndex();
-    computeCurveIntersection(optixGetPrimitiveIndex(),
+    computeCurveIntersection(primIdx,
         si.p,
         si.n,
         si.t,
         si.hair.curve_p,
         si.hair.radius,
         si.uv);
+    si.hair.curvePrimIndex = primIdx;
 
     vec3f X = si.t;
     vec3f Y = normalize(cross(si.wo, X));
     vec3f Z = normalize(cross(X, Y));
+
+    BuildONB(X,Y,Z);
 
     si.to_local[0] = X;
     si.to_local[1] = Y;

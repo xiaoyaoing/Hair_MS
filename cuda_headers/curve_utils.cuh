@@ -223,8 +223,7 @@ void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3
 
     float u = optixGetCurveParameter();
 
-    uv.x = primitiveIndex / 10000.f- int(primitiveIndex/10000.f);
-    uv.y = u;
+
   //  printf("%f ",u);
 
 #define CURVE_CATMULL_ROM

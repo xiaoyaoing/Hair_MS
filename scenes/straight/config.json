@@ -17,8 +17,8 @@
     },
     "hair": {
         "alpha": 2.0,
-        "beta_m": 0.3,
-        "beta_n": 0.3,
+        "beta_m": 0.1,
+        "beta_n": 0.1,
         "type": 1,
         "sigma_a": [
             0.06,
@@ -33,9 +33,9 @@
         "MIS": true,
         "height": 1024,
         "image_output": "E:/code/HairMSNN/scenes/straight/render.png",
-        "path_v1": 1,
+        "path_v1": 4,
         "path_v2": 40,
-        "spp": 500,
+        "spp": 100,
         "stats_output": "E:/code/HairMSNN/scenes/straight/stats.json",
         "width": 1024
     },

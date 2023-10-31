@@ -390,9 +390,27 @@ int saveBufferAsEXR(std::string path, float* hostBuffer, int width, int height, 
     std::string savePath = path;
     return SaveEXR(hostBuffer, width, height, numComponents, 0, savePath.c_str(), nullptr);
 }
+inline bool fileExists (const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
+
+
+
 
 int saveEXR(std::string path,  float* hostBuffer, int accumId, int width, int height)
 {
+
+  auto suffix = path.substr(path.find_last_of("."));
+  path = path.substr(0,path.find_last_of("."));
+  std::string destPath = path + "." +suffix;
+  int count = 1;
+        while( fileExists(destPath)){
+            destPath = stringFormat("%s%d.%s",path.c_str(),count++,suffix.c_str());
+        }
+
+    path = destPath;
+
     std::vector<float> inverted;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -405,7 +423,7 @@ int saveEXR(std::string path,  float* hostBuffer, int accumId, int width, int he
         }
     }
 
-    LOG("(EXR) Accum buffer saved to file!");
+    LOG(path+"Saved");
 
     return saveBufferAsEXR(path, inverted.data(), width, height, 4);
 }
