@@ -40,6 +40,8 @@ struct HairInteraction {
 	float s = 0.f;
 
 	float sin2kAlpha[3] = { 0.f }, cos2kAlpha[3] = { 0.f };
+
+	int hair_strand_index;
 };
 
 // Interaction data

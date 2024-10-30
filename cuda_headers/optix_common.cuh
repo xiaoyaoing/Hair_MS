@@ -561,12 +561,15 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
     Interaction& si = owl::getPRD<Interaction>();
 
     unsigned int primIdx = optixGetPrimitiveIndex();
+    
     computeCurveIntersection(optixGetPrimitiveIndex(),
         si.p,
         si.n,
         si.t,
         si.hair.curve_p,
         si.hair.radius);
+
+    si.hair.hair_strand_index = primIdx;
 
     vec3f X = si.t;
     vec3f Y = normalize(cross(si.wo, X));

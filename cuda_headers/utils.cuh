@@ -20,6 +20,14 @@ void writePixel(vec3f& color, int accumId,
     if (isnan(color.x) || isnan(color.y) || isnan(color.z))
         color = vec3f(0.f);
 
+    if(accumId > optixLaunchParams.targetSpp) {
+        float4 c = averageBuffer[offset];
+        frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(c.x),
+            linear_to_srgb(c.y),
+            linear_to_srgb(c.z)));
+        return;
+    }
+
     // Write the calculated radiance
     if (accumId > 0) {
         color = color + vec3f(accumBuffer[offset]);
@@ -29,6 +37,14 @@ void writePixel(vec3f& color, int accumId,
     color = (1.f / (accumId + 1)) * color;
 
     averageBuffer[offset] = vec4f(color, 1.0);
+    frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(color.x),
+        linear_to_srgb(color.y),
+        linear_to_srgb(color.z)));
+}
+
+__device__
+void writePixel(float4 * denoiseBuffer, uint32_t* frameBuffer,int offset) {
+    vec4f color = vec4f(denoiseBuffer[offset]);
     frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(color.x),
         linear_to_srgb(color.y),
         linear_to_srgb(color.z)));

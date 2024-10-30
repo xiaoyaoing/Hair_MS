@@ -27,6 +27,7 @@ struct Scene {
 	bool has_surface = false;
 
 	cyHairFile hair;
+	float width_scale = 1.f;
 	HairModel hairModel;
 	bool has_hair = false;
 
@@ -55,6 +56,7 @@ struct Scene {
 
 	// General integrator parameters
 	bool MIS = true, envPdfSampling = true;
+	std::string hair_path;
 	bool denoise = false;
 
 	int spp = 1, path_v1 = 0, path_v2 = 0;

@@ -18,13 +18,15 @@ void Scene::extractHairData()
 
     const float* widthsData = this->hair.GetThicknessArray();
     const float defaultWidth = this->hair.GetHeader().d_thickness;
-
+    
     int strandIndex = 0;
     int numSegmentsLeft = -1;
 
     for (int i = 0; i < numControlPoints; i++) {
         const vec3f p = vec3f(controlPointsData[i * 3], controlPointsData[i * 3 + 1], controlPointsData[i * 3 + 2]);
-        const float w = widthsData ? widthsData[i] : defaultWidth;
+         float w = widthsData ? widthsData[i] : defaultWidth;
+
+        w = w  * width_scale;
 
         this->hairModel.maxBound = max(p, this->hairModel.maxBound);
         this->hairModel.minBound = min(p, this->hairModel.minBound);
@@ -153,6 +155,12 @@ bool parseScene(std::string sceneFile, Scene& scene)
 
         // Load Cem Yuksel's hair models
         LoadCemYuksel(hairFilePath.c_str(), scene.hair);
+        if(hairFilePath.find("bear")!=std::string::npos)
+            scene.width_scale = 0.05f;
+        if(hairFilePath.find("ponytail")!=std::string::npos)
+            scene.width_scale = 0.02f;
+        if(hairFilePath.find("straight")!=std::string::npos)
+            scene.width_scale = 1.5f;
         scene.extractHairData();
 
         is_hair = true;

@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="HairMSNN" targetName="int10-texturedTriangles-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int01-simpleTriangles" />
+      <config projectName="HairMSNN" targetName="int17-curveMaterials-ptx" />
+      <config projectName="HairMSNN" targetName="sample10-launch3D" />
+      <config projectName="HairMSNN" targetName="tinyexr" />
+      <config projectName="HairMSNN" targetName="sample06-rtow-mixedGeometries-ptx" />
+      <config projectName="HairMSNN" targetName="miniz" />
+      <config projectName="HairMSNN" targetName="sample01-simpleTriangles-ptx" />
+      <config projectName="HairMSNN" targetName="sample10-launch3D-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample06-rtow-mixedGeometries" />
+      <config projectName="HairMSNN" targetName="int01-simpleTriangles-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int13-motionBlurBoxes" />
+      <config projectName="HairMSNN" targetName="tinyobjloader" />
+      <config projectName="HairMSNN" targetName="owl_viewer" />
+      <config projectName="HairMSNN" targetName="glfw" />
+      <config projectName="HairMSNN" targetName="render_nrc" />
+      <config projectName="HairMSNN" targetName="int16-curves-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int18-spherePrimitives-ptx" />
+      <config projectName="HairMSNN" targetName="sample10-launch3D-ptx" />
+      <config projectName="HairMSNN" targetName="int01-simpleTriangles-ptx" />
+      <config projectName="HairMSNN" targetName="sample11-textures" />
+      <config projectName="HairMSNN" targetName="int17-curveMaterials-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample06-rtow-mixedGeometries-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int11-rotatingBoxes-ptx" />
+      <config projectName="HairMSNN" targetName="adv_optix7course" />
+      <config projectName="HairMSNN" targetName="int16-curves-ptx" />
+      <config projectName="HairMSNN" targetName="int07-whitted-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int11-rotatingBoxes-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int18-spherePrimitives" />
+      <config projectName="HairMSNN" targetName="adv_optix7course-ptx" />
+      <config projectName="HairMSNN" targetName="int18-spherePrimitives-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample08-sierpinski" />
+      <config projectName="HairMSNN" targetName="sample11-textures-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample07-rtow-multiGPU-ptx" />
+      <config projectName="HairMSNN" targetName="path_tracing_ptx" />
+      <config projectName="HairMSNN" targetName="int17-curveMaterials" />
+      <config projectName="HairMSNN" targetName="sample05-rtow" />
+      <config projectName="HairMSNN" targetName="tiny-cuda-nn" />
+      <config projectName="HairMSNN" targetName="sample09-motionBlurSimpleTriangles" />
+      <config projectName="HairMSNN" targetName="sample01-simpleTriangles-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int06-rtow-mixedGeometries-ptx" />
+      <config projectName="HairMSNN" targetName="int06-rtow-mixedGeometries" />
+      <config projectName="HairMSNN" targetName="fmt" />
+      <config projectName="HairMSNN" targetName="int12-switchingTextureSets-ptx" />
+      <config projectName="HairMSNN" targetName="hair_msnn_ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int13-motionBlurBoxes-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int11-rotatingBoxes" />
+      <config projectName="HairMSNN" targetName="render_hair_msnn" />
+      <config projectName="HairMSNN" targetName="sample08-sierpinski-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample05-rtow-ptx" />
+      <config projectName="HairMSNN" targetName="sample00-rayGenOnly" />
+      <config projectName="HairMSNN" targetName="int07-whitted-ptx" />
+      <config projectName="HairMSNN" targetName="int10-texturedTriangles" />
+      <config projectName="HairMSNN" targetName="sample09-motionBlurSimpleTriangles-ptx" />
+      <config projectName="HairMSNN" targetName="uninstall" />
+      <config projectName="HairMSNN" targetName="int10-texturedTriangles-ptx" />
+      <config projectName="HairMSNN" targetName="sample09-motionBlurSimpleTriangles-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int15-cookBilliardScene-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="path_tracing_ptx_ptx" />
+      <config projectName="HairMSNN" targetName="adv_optix7course-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int12-switchingTextureSets-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int15-cookBilliardScene-ptx" />
+      <config projectName="HairMSNN" targetName="render_path_tracing" />
+      <config projectName="HairMSNN" targetName="int13-motionBlurBoxes-ptx" />
+      <config projectName="HairMSNN" targetName="sample07-rtow-multiGPU" />
+      <config projectName="HairMSNN" targetName="int16-curves" />
+      <config projectName="HairMSNN" targetName="hair_msnn_ptx" />
+      <config projectName="HairMSNN" targetName="sample08-sierpinski-ptx" />
+      <config projectName="HairMSNN" targetName="nrc_ptx" />
+      <config projectName="HairMSNN" targetName="int15-cookBilliardScene" />
+      <config projectName="HairMSNN" targetName="int12-switchingTextureSets" />
+      <config projectName="HairMSNN" targetName="sample00-rayGenOnly-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="int07-whitted" />
+      <config projectName="HairMSNN" targetName="test_tinyexr" />
+      <config projectName="HairMSNN" targetName="owl" />
+      <config projectName="HairMSNN" targetName="sample05-rtow-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample00-rayGenOnly-ptx" />
+      <config projectName="HairMSNN" targetName="int06-rtow-mixedGeometries-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample07-rtow-multiGPU-ptx_ptx" />
+      <config projectName="HairMSNN" targetName="sample11-textures-ptx" />
+      <config projectName="HairMSNN" targetName="sample01-simpleTriangles" />
+      <config projectName="HairMSNN" targetName="nrc_ptx_ptx" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug-Visual Studio" ENABLED="true" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Visual Studio" GENERATION_OPTIONS="-G &quot;Visual Studio 17 2022&quot;" />
+      <configuration PROFILE_NAME="Release-Visual Studio" ENABLED="true" CONFIG_NAME="Release" TOOLCHAIN_NAME="Visual Studio" />
+      <configuration PROFILE_NAME="Debug-Visual Studio  2022" ENABLED="true" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Visual Studio  2022" GENERATION_OPTIONS="-G &quot;Visual Studio 17 2022&quot; -D CudaToolkitDir=&quot;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1&quot; -D CUDAToolkit_ROOT=&quot;C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1&quot; -D CMAKE_CUDA_COMPILER=&quot;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe&quot; -D TCNN_CUDA_ARCHITECTURES=86 -D OptiX_ROOT_DIR=&quot;C:/ProgramData/NVIDIA Corporation/OptiX SDK 8.0.0/&quot; .." />
+      <configuration PROFILE_NAME="Release-Visual Studio  2022" ENABLED="true" CONFIG_NAME="Release" TOOLCHAIN_NAME="Visual Studio  2022" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="RelWithDebInfo-Visual Studio  2022" ENABLED="true" CONFIG_NAME="RelWithDebInfo" TOOLCHAIN_NAME="Visual Studio  2022" />
+      <configuration PROFILE_NAME="RelWithDebInfo" ENABLED="true" CONFIG_NAME="RelWithDebInfo" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="487c72a2-6b63-4e27-8710-6d7d9e5676a1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/cuda/hair_msnn.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda/hair_msnn.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cuda_headers/optix_common.cuh" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_headers/optix_common.cuh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/json" beforeDir="false" afterPath="$PROJECT_DIR$/extern/json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/json/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/extern/json/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/owl" beforeDir="false" afterPath="$PROJECT_DIR$/extern/owl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/owl/owl/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/extern/owl/owl/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/owl/owl/DeviceContext.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/extern/owl/owl/DeviceContext.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/owl/owl/cmake/embed_ptx.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/extern/owl/owl/cmake/embed_ptx.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/owl/owl/include/owl/common/math/vec.h" beforeDir="false" afterPath="$PROJECT_DIR$/extern/owl/owl/include/owl/common/math/vec.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/common.h" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/loss.h" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/loss.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/losses/l2.h" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/losses/l2.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extern/tiny-cuda-nn/src/loss.cu" beforeDir="false" afterPath="$PROJECT_DIR$/extern/tiny-cuda-nn/src/loss.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/curly/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/curly/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scenes/curly/render.exr" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/curly/render.exr" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:RelWithDebInfo-Visual Studio  2022" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/losses/vec_math.h" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="1.4" />
+  </component>
+  <component name="ProjectId" id="2Uk1Ni2U1SsQn0G07dW37oL0Y7A" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.has.clang-format": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "hair-1",
+    "last_opened_file_path": "E:/code/Utopia",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CMakeSettings",
+    "structure.view.defaults.are.configured": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="CMake Application.render_hair_msnn">
+    <configuration name="HairMSNN" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory" temporary="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="adv_optix7course-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="adv_optix7course-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="adv_optix7course-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="adv_optix7course-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="adv_optix7course" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="adv_optix7course" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="adv_optix7course">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="fmt" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="fmt" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="glfw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="glfw" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="hair_msnn_ptx" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="E:\code\HairMSNN\scenes\curly\config.json 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="hair_msnn_ptx" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="render_hair_msnn">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="hair_msnn_ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="hair_msnn_ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int01-simpleTriangles-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int01-simpleTriangles-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int01-simpleTriangles-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int01-simpleTriangles-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int01-simpleTriangles" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int01-simpleTriangles" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int01-simpleTriangles">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int06-rtow-mixedGeometries-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int06-rtow-mixedGeometries-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int06-rtow-mixedGeometries-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int06-rtow-mixedGeometries-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int06-rtow-mixedGeometries" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int06-rtow-mixedGeometries" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int06-rtow-mixedGeometries">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int07-whitted-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int07-whitted-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int07-whitted-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int07-whitted-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int07-whitted" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int07-whitted" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int07-whitted">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int10-texturedTriangles-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int10-texturedTriangles-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int10-texturedTriangles-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int10-texturedTriangles-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int10-texturedTriangles" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int10-texturedTriangles" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int10-texturedTriangles">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int11-rotatingBoxes-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int11-rotatingBoxes-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int11-rotatingBoxes-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int11-rotatingBoxes-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int11-rotatingBoxes" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int11-rotatingBoxes" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int11-rotatingBoxes">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int12-switchingTextureSets-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int12-switchingTextureSets-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int12-switchingTextureSets-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int12-switchingTextureSets-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int12-switchingTextureSets" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int12-switchingTextureSets" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int12-switchingTextureSets">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int13-motionBlurBoxes-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int13-motionBlurBoxes-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int13-motionBlurBoxes-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int13-motionBlurBoxes-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int13-motionBlurBoxes" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int13-motionBlurBoxes" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int13-motionBlurBoxes">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int15-cookBilliardScene-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int15-cookBilliardScene-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int15-cookBilliardScene-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int15-cookBilliardScene-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int15-cookBilliardScene" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int15-cookBilliardScene" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int15-cookBilliardScene">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int16-curves-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int16-curves-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int16-curves-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int16-curves-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int16-curves" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int16-curves" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int16-curves">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int17-curveMaterials-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int17-curveMaterials-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int17-curveMaterials-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int17-curveMaterials-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int17-curveMaterials" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int17-curveMaterials" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int17-curveMaterials">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int18-spherePrimitives-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int18-spherePrimitives-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int18-spherePrimitives-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int18-spherePrimitives-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="int18-spherePrimitives" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="int18-spherePrimitives" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="int18-spherePrimitives">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="miniz" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="miniz" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="nrc_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="nrc_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="nrc_ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="nrc_ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="owl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="owl" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="owl_viewer" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="owl_viewer" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="path_tracing_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="path_tracing_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="path_tracing_ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="path_tracing_ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="render_hair_msnn" type="CMakeRunConfiguration" factoryName="Application" singleton="false" PROGRAM_PARAMS="E:\code\HairMSNN\scenes\curly\config.json  " REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="render_hair_msnn" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="render_hair_msnn">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="render_nrc" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="render_nrc" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="render_nrc">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="render_path_tracing" type="CMakeRunConfiguration" factoryName="Application" singleton="false" PROGRAM_PARAMS="E:\code\HairMSNN\scenes\curly\config.json" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="render_path_tracing" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="render_path_tracing">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample00-rayGenOnly-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample00-rayGenOnly-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample00-rayGenOnly-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample00-rayGenOnly-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample00-rayGenOnly" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample00-rayGenOnly" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample00-rayGenOnly">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample01-simpleTriangles-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample01-simpleTriangles-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample01-simpleTriangles-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample01-simpleTriangles-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample01-simpleTriangles" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample01-simpleTriangles" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample01-simpleTriangles">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample05-rtow-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample05-rtow-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample05-rtow-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample05-rtow-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample05-rtow" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample05-rtow" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample05-rtow">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample06-rtow-mixedGeometries-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample06-rtow-mixedGeometries-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample06-rtow-mixedGeometries-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample06-rtow-mixedGeometries-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample06-rtow-mixedGeometries" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample06-rtow-mixedGeometries" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample06-rtow-mixedGeometries">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample07-rtow-multiGPU-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample07-rtow-multiGPU-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample07-rtow-multiGPU-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample07-rtow-multiGPU-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample07-rtow-multiGPU" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample07-rtow-multiGPU" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample07-rtow-multiGPU">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample08-sierpinski-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample08-sierpinski-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample08-sierpinski-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample08-sierpinski-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample08-sierpinski" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample08-sierpinski" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample08-sierpinski">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample09-motionBlurSimpleTriangles-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample09-motionBlurSimpleTriangles-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample09-motionBlurSimpleTriangles-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample09-motionBlurSimpleTriangles-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample09-motionBlurSimpleTriangles" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample09-motionBlurSimpleTriangles" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample09-motionBlurSimpleTriangles">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample10-launch3D-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample10-launch3D-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample10-launch3D-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample10-launch3D-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample10-launch3D" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample10-launch3D" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample10-launch3D">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample11-textures-ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample11-textures-ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample11-textures-ptx_ptx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample11-textures-ptx_ptx" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sample11-textures" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="sample11-textures" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="sample11-textures">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_tinyexr" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="test_tinyexr" CONFIG_NAME="Debug-Visual Studio" RUN_TARGET_PROJECT_NAME="HairMSNN" RUN_TARGET_NAME="test_tinyexr">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="tiny-cuda-nn" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="tiny-cuda-nn" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="tinyexr" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="tinyexr" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="tinyobjloader" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="tinyobjloader" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="uninstall" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="HairMSNN" TARGET_NAME="uninstall" CONFIG_NAME="Debug-Visual Studio">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.hair_msnn_ptx" />
+      <item itemvalue="CMake Application.hair_msnn_ptx_ptx" />
+      <item itemvalue="CMake Application.nrc_ptx" />
+      <item itemvalue="CMake Application.nrc_ptx_ptx" />
+      <item itemvalue="CMake Application.path_tracing_ptx" />
+      <item itemvalue="CMake Application.path_tracing_ptx_ptx" />
+      <item itemvalue="CMake Application.render_hair_msnn" />
+      <item itemvalue="CMake Application.render_nrc" />
+      <item itemvalue="CMake Application.render_path_tracing" />
+      <item itemvalue="CMake Application.tiny-cuda-nn" />
+      <item itemvalue="CMake Application.glfw" />
+      <item itemvalue="CMake Application.owl" />
+      <item itemvalue="CMake Application.adv_optix7course" />
+      <item itemvalue="CMake Application.adv_optix7course-ptx" />
+      <item itemvalue="CMake Application.adv_optix7course-ptx_ptx" />
+      <item itemvalue="CMake Application.sample00-rayGenOnly" />
+      <item itemvalue="CMake Application.sample00-rayGenOnly-ptx" />
+      <item itemvalue="CMake Application.sample00-rayGenOnly-ptx_ptx" />
+      <item itemvalue="CMake Application.sample01-simpleTriangles" />
+      <item itemvalue="CMake Application.sample01-simpleTriangles-ptx" />
+      <item itemvalue="CMake Application.sample01-simpleTriangles-ptx_ptx" />
+      <item itemvalue="CMake Application.sample05-rtow" />
+      <item itemvalue="CMake Application.sample05-rtow-ptx" />
+      <item itemvalue="CMake Application.sample05-rtow-ptx_ptx" />
+      <item itemvalue="CMake Application.sample06-rtow-mixedGeometries" />
+      <item itemvalue="CMake Application.sample06-rtow-mixedGeometries-ptx" />
+      <item itemvalue="CMake Application.sample06-rtow-mixedGeometries-ptx_ptx" />
+      <item itemvalue="CMake Application.sample07-rtow-multiGPU" />
+      <item itemvalue="CMake Application.sample07-rtow-multiGPU-ptx" />
+      <item itemvalue="CMake Application.sample07-rtow-multiGPU-ptx_ptx" />
+      <item itemvalue="CMake Application.sample08-sierpinski" />
+      <item itemvalue="CMake Application.sample08-sierpinski-ptx" />
+      <item itemvalue="CMake Application.sample08-sierpinski-ptx_ptx" />
+      <item itemvalue="CMake Application.sample09-motionBlurSimpleTriangles" />
+      <item itemvalue="CMake Application.sample09-motionBlurSimpleTriangles-ptx" />
+      <item itemvalue="CMake Application.sample09-motionBlurSimpleTriangles-ptx_ptx" />
+      <item itemvalue="CMake Application.sample10-launch3D" />
+      <item itemvalue="CMake Application.sample10-launch3D-ptx" />
+      <item itemvalue="CMake Application.sample10-launch3D-ptx_ptx" />
+      <item itemvalue="CMake Application.sample11-textures" />
+      <item itemvalue="CMake Application.sample11-textures-ptx" />
+      <item itemvalue="CMake Application.sample11-textures-ptx_ptx" />
+      <item itemvalue="CMake Application.owl_viewer" />
+      <item itemvalue="CMake Application.int01-simpleTriangles" />
+      <item itemvalue="CMake Application.int01-simpleTriangles-ptx" />
+      <item itemvalue="CMake Application.int01-simpleTriangles-ptx_ptx" />
+      <item itemvalue="CMake Application.int06-rtow-mixedGeometries" />
+      <item itemvalue="CMake Application.int06-rtow-mixedGeometries-ptx" />
+      <item itemvalue="CMake Application.int06-rtow-mixedGeometries-ptx_ptx" />
+      <item itemvalue="CMake Application.int07-whitted" />
+      <item itemvalue="CMake Application.int07-whitted-ptx" />
+      <item itemvalue="CMake Application.int07-whitted-ptx_ptx" />
+      <item itemvalue="CMake Application.int10-texturedTriangles" />
+      <item itemvalue="CMake Application.int10-texturedTriangles-ptx" />
+      <item itemvalue="CMake Application.int10-texturedTriangles-ptx_ptx" />
+      <item itemvalue="CMake Application.int11-rotatingBoxes" />
+      <item itemvalue="CMake Application.int11-rotatingBoxes-ptx" />
+      <item itemvalue="CMake Application.int11-rotatingBoxes-ptx_ptx" />
+      <item itemvalue="CMake Application.int12-switchingTextureSets" />
+      <item itemvalue="CMake Application.int12-switchingTextureSets-ptx" />
+      <item itemvalue="CMake Application.int12-switchingTextureSets-ptx_ptx" />
+      <item itemvalue="CMake Application.int13-motionBlurBoxes" />
+      <item itemvalue="CMake Application.int13-motionBlurBoxes-ptx" />
+      <item itemvalue="CMake Application.int13-motionBlurBoxes-ptx_ptx" />
+      <item itemvalue="CMake Application.int15-cookBilliardScene" />
+      <item itemvalue="CMake Application.int15-cookBilliardScene-ptx" />
+      <item itemvalue="CMake Application.int15-cookBilliardScene-ptx_ptx" />
+      <item itemvalue="CMake Application.int16-curves" />
+      <item itemvalue="CMake Application.int16-curves-ptx" />
+      <item itemvalue="CMake Application.int16-curves-ptx_ptx" />
+      <item itemvalue="CMake Application.int17-curveMaterials" />
+      <item itemvalue="CMake Application.int17-curveMaterials-ptx" />
+      <item itemvalue="CMake Application.int17-curveMaterials-ptx_ptx" />
+      <item itemvalue="CMake Application.int18-spherePrimitives" />
+      <item itemvalue="CMake Application.int18-spherePrimitives-ptx" />
+      <item itemvalue="CMake Application.int18-spherePrimitives-ptx_ptx" />
+      <item itemvalue="CMake Application.fmt" />
+      <item itemvalue="CMake Application.miniz" />
+      <item itemvalue="CMake Application.test_tinyexr" />
+      <item itemvalue="CMake Application.tinyexr" />
+      <item itemvalue="CMake Application.tinyobjloader" />
+      <item itemvalue="CMake Application.uninstall" />
+      <item itemvalue="CMake Debug.HairMSNN" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="CMake Debug.HairMSNN" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="487c72a2-6b63-4e27-8710-6d7d9e5676a1" name="Changes" comment="" />
+      <created>1693468726271</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1693468726271</updated>
+      <workItem from="1693468727392" duration="2520000" />
+      <workItem from="1693473325326" duration="6598000" />
+      <workItem from="1693491193531" duration="5614000" />
+      <workItem from="1693722213725" duration="7489000" />
+      <workItem from="1693804710837" duration="12800000" />
+      <workItem from="1694068753900" duration="2344000" />
+      <workItem from="1694176808983" duration="12011000" />
+      <workItem from="1694250163443" duration="13090000" />
+      <workItem from="1694313826688" duration="1967000" />
+      <workItem from="1694319189599" duration="169000" />
+      <workItem from="1694322169054" duration="12643000" />
+      <workItem from="1694413438609" duration="9244000" />
+      <workItem from="1694437839995" duration="2717000" />
+      <workItem from="1694483784838" duration="8840000" />
+      <workItem from="1694501972793" duration="5877000" />
+      <workItem from="1694516559580" duration="5574000" />
+      <workItem from="1694619184982" duration="2307000" />
+      <workItem from="1694681546466" duration="11871000" />
+      <workItem from="1694704689956" duration="45639000" />
+      <workItem from="1694870575364" duration="9569000" />
+      <workItem from="1695112555811" duration="5617000" />
+      <workItem from="1695177277998" duration="8737000" />
+      <workItem from="1695207127601" duration="1838000" />
+      <workItem from="1695384599849" duration="1201000" />
+      <workItem from="1695446364896" duration="984000" />
+      <workItem from="1695454815677" duration="2470000" />
+      <workItem from="1695623767839" duration="2988000" />
+      <workItem from="1695696847979" duration="588000" />
+      <workItem from="1695780969441" duration="4700000" />
+      <workItem from="1695864769860" duration="9580000" />
+      <workItem from="1696168245455" duration="1208000" />
+      <workItem from="1696172054319" duration="4767000" />
+      <workItem from="1696226217863" duration="749000" />
+      <workItem from="1696234431086" duration="3376000" />
+      <workItem from="1696303092892" duration="16000" />
+      <workItem from="1696308706264" duration="1077000" />
+      <workItem from="1696923936389" duration="16769000" />
+      <workItem from="1697016639610" duration="349000" />
+      <workItem from="1697084492808" duration="10607000" />
+      <workItem from="1697161781906" duration="4474000" />
+      <workItem from="1697183670873" duration="8542000" />
+      <workItem from="1697274774448" duration="44771000" />
+      <workItem from="1697445044437" duration="7058000" />
+      <workItem from="1697533006286" duration="515000" />
+      <workItem from="1697547433731" duration="3562000" />
+      <workItem from="1698304831566" duration="594000" />
+      <workItem from="1698392868303" duration="1529000" />
+      <workItem from="1698409135022" duration="593000" />
+      <workItem from="1698470162232" duration="1756000" />
+      <workItem from="1698634568006" duration="5645000" />
+      <workItem from="1698731759074" duration="33374000" />
+      <workItem from="1698854708397" duration="6458000" />
+      <workItem from="1699239175624" duration="1292000" />
+      <workItem from="1700548759514" duration="4103000" />
+      <workItem from="1700833985224" duration="41566000" />
+      <workItem from="1701314343584" duration="36533000" />
+      <workItem from="1701867591968" duration="103000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticEditVcpkgJson value="false" />
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticFoundErrors value="true" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/model.cpp</url>
+          <line>22</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda_headers/hair_msnn.cuh</url>
+          <line>112</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda_headers/curve_utils.cuh</url>
+          <line>213</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda_headers/disney_hair.cuh</url>
+          <line>270</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda_headers/optix_common.cuh</url>
+          <line>404</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda/hair_msnn.cu</url>
+          <line>567</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/encodings/composite.h</url>
+          <line>387</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/extern/tiny-cuda-nn/include/tiny-cuda-nn/losses/l2.h</url>
+          <line>518</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/render_path_tracing.cu</url>
+          <line>642</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="CMakeLineBreakpoint">
+          <url>file://$PROJECT_DIR$/extern/owl/owl/CMakeLists.txt</url>
+          <line>21</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="this-&gt;sbtDirty" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

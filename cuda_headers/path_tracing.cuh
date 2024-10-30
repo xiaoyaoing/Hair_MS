@@ -9,12 +9,29 @@
 
 #include "common.cuh"
 
+// #include <render_path_tracing.h>
+
+struct DenoiseGBuffer {
+	vec3f normal;
+	vec3f tangent;
+	vec3f color;
+	vec3f position;
+	uint32_t strand_index;
+	bool hit;
+	float radius;
+};
+
 struct LaunchParams {
 	float4* accumBuffer;
+	float4* denoiseBuffer;
 	float4* averageBuffer;
 	int accumId;
 
 	OptixTraversableHandle world;
+
+	DenoiseGBuffer* gBuffer;
+	DenoiseGBuffer* fittedGuffer;
+
 
 	bool hasEnvLight, envPdfSampling;
 	float envScale, envRotPhi;
@@ -50,6 +67,25 @@ struct LaunchParams {
 	// Properties of the scene
 	vec3f maxBound, minBound;
 	float sceneScale;
+
+	float positionSigma;
+	float tangentSigma;
+	float colorSigma;
+	float thetaRange;
+	float radiusScale;
+	float weightThreshold;
+	float tangentThreshold;
+	float fitDeltaThreshold;
+
+	uint32_t debugMode;
+	int targetSpp;
+
 };
+
+#define VisualizeResults 0
+#define VisualizeNormal 1
+#define VisualizeTangent 2
+#define VisualizePosition 3
+#define VisualizeBlack 4
 
 __constant__ LaunchParams optixLaunchParams;

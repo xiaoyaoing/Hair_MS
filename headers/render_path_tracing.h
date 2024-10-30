@@ -21,6 +21,8 @@
 // Compiled PTX code
 extern "C" char path_tracing_ptx[];
 
+
+
 struct RenderWindowPT : public owl::viewer::OWLViewer
 {
     RenderWindowPT(Scene& scene, vec2i resolution, bool interactive);
@@ -53,8 +55,12 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
 
     bool sbtDirty = true;
     bool progressive = true;
+    bool fitGBuffer = false;
+    bool denoiseEnabled = false;
 
     OWLRayGen rayGen{ 0 };
+    OWLRayGen fitGBufferPass{0};
+    OWLRayGen denoise{0};
     OWLMissProg missProg{ 0 };
 
     OWLGroup world;
@@ -65,6 +71,17 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     // Properties about the scene
     vec3f maxBound = vec3f(-1e30f), minBound = vec3f(1e30f);
     float sceneScale = 0.f;
+
+    float positionSigma = 0.16f;
+    float tangentSigma = 1.f;
+    float colorSigma = 1.f;
+    float thetaRange = 3.14159265359f / 4.f;
+    float radiusScale = 80.f;
+    float weightThreshold = 0.15f;
+    float tangentThreshold = 0.9f;
+    float fitDeltaThreshold = 1.5f;
+    int targetSpp = 1;
+    
 
     // Hair geometry and its parameters
     OWLGeom hairGeom;
@@ -90,8 +107,14 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     int tileSize = 64;
     vec2i numBlocksAndThreads;
 
+    OWLBuffer gBuffer{ 0 };
+    OWLBuffer fittedGBuffer{ 0 };
+
+
     float4* denoisedBuffer;
     float4* denoiserAlbedoInput;
     float4* denoiserNormalInput;
     float* denoiserIntensity;
+
+    int debugMode = 0;
 };
