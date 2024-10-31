@@ -21,11 +21,11 @@
         "beta_n": 0.3,
         "type": 1,
         "sigma_a": [
-            0.06,
-            0.1,
-            0.2
+            0.24,
+            0.51,
+            1.36
         ],
-        "geometry": "E:\\code\\HairMSNN\\scenes\\straight\\wStraight.hair"
+        "geometry": "E:\\code\\Hair_MS\\data\\scene\\straight\\straight.hair"
     },
     "integrator": {
         "ENV_PDF": true,
@@ -39,14 +39,10 @@
         "width": 1024
     },
     "lights": {
-        "environment": {
-            "exr": "F:\\HairMSNN\\scenes\\envmaps\\christmas_photo_studio_07_4k.exr",
-            "scale": 1
-        },
         "directional": [
             {
-                "from": [3, 3, 3],
-                "emit": [1, 1, 1]
+                "from": [-100, -200, -100],
+                "emit": [10, 10, 10]
             }
         ]
     },

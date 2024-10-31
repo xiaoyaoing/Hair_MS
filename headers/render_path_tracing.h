@@ -79,8 +79,8 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     float radiusScale = 80.f;
     float weightThreshold = 0.15f;
     float tangentThreshold = 0.9f;
-    float fitDeltaThreshold = 1.5f;
-    int targetSpp = 3;
+    float fitDeltaThreshold = 0.4f;
+    int targetSpp = 1;
     
 
     // Hair geometry and its parameters

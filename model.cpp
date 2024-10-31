@@ -165,6 +165,7 @@ bool loadEnvTexture(std::string& path, Texture *texture)
 
     int ret = LoadEXR(&out, &width, &height, path.c_str(), &err);
 
+    memset(out, 100, width * height * 4 * sizeof(float));
     if (ret != TINYEXR_SUCCESS) {
         LOG("Could not load environment map from " << path);
         return false;
@@ -173,7 +174,6 @@ bool loadEnvTexture(std::string& path, Texture *texture)
         vec2i res(width, height);
         texture->resolution = res;
         texture->pixel_float = out;
-
         return true;
     }
 

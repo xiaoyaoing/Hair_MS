@@ -158,9 +158,9 @@ bool parseScene(std::string sceneFile, Scene& scene)
         if(hairFilePath.find("bear")!=std::string::npos)
             scene.width_scale = 0.05f;
         if(hairFilePath.find("ponytail")!=std::string::npos)
-            scene.width_scale = 0.02f;
+            scene.width_scale = 0.05f;
         if(hairFilePath.find("straight")!=std::string::npos)
-            scene.width_scale = 1.5f;
+            scene.width_scale = 10.5f;
         scene.extractHairData();
 
         is_hair = true;

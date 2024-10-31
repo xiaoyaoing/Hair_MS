@@ -20,8 +20,8 @@
     "camera_path": [],
     "hair": {
         "alpha": 2.0,
-        "beta_m": 0.3,
-        "beta_n": 0.3,
+        "beta_m": 0.7,
+        "beta_n": 0.7,
         "geometry": "E:\\code\\vkhr1\\share\\styles\\ponytail.hair",
         "sigma_a": [
             0.24,
@@ -43,8 +43,8 @@
     },
     "lights": {
         "environment": {
-            "exr": "E:\\code\\yocto-gl\\tests\\_data\\textures\\sky1.exr",
-            "scale": 1
+            "exr": "E:\\code\\moer-bssrdf\\scenes\\livingroom\\textures\\Sky 19.exr",
+            "scale": 0.3
         }
     },
     "tcnn": {

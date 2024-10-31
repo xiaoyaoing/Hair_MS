@@ -8,6 +8,8 @@
 #include "render_path_tracing.h"
 #include "utils.cuh"
 
+bool scriptSave = false;
+
 // ====================================================
 // Custom functions
 // ====================================================
@@ -290,18 +292,20 @@ void RenderWindowPT::initialize() {
       {"minBound", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, minBound)},
       {"sceneScale", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, sceneScale)},
 
-        {"positionSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, positionSigma)},
-        {"tangentSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, tangentSigma)},
-        {"colorSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, colorSigma)},
-        {"thetaRange", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, thetaRange)},
-        {"radiusScale", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, radiusScale)},
-        {"weightThreshold", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, weightThreshold)},
-         {"tangentThreshold", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, tangentThreshold)},
-     {"fitDeltaThreshold", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, fitDeltaThreshold)},
-    {"debugMode", OWL_INT, OWL_OFFSETOF(LaunchParams, debugMode)},
-    {"targetSpp", OWL_INT, OWL_OFFSETOF(LaunchParams, targetSpp)},
+      {"positionSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, positionSigma)},
+      {"tangentSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, tangentSigma)},
+      {"colorSigma", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, colorSigma)},
+      {"thetaRange", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, thetaRange)},
+      {"radiusScale", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, radiusScale)},
+      {"weightThreshold", OWL_FLOAT,
+       OWL_OFFSETOF(LaunchParams, weightThreshold)},
+      {"tangentThreshold", OWL_FLOAT,
+       OWL_OFFSETOF(LaunchParams, tangentThreshold)},
+      {"fitDeltaThreshold", OWL_FLOAT,
+       OWL_OFFSETOF(LaunchParams, fitDeltaThreshold)},
+      {"debugMode", OWL_INT, OWL_OFFSETOF(LaunchParams, debugMode)},
+      {"targetSpp", OWL_INT, OWL_OFFSETOF(LaunchParams, targetSpp)},
 
-    
       // Global Hair parameters
       {"sig_a", OWL_FLOAT3, OWL_OFFSETOF(LaunchParams, hairData.sig_a)},
       {"beta_m", OWL_FLOAT, OWL_OFFSETOF(LaunchParams, hairData.beta_m)},
@@ -350,20 +354,12 @@ void RenderWindowPT::initialize() {
                  owl3f{this->minBound.x, this->minBound.y, this->minBound.z});
   owlParamsSet1f(this->launchParams, "sceneScale", this->sceneScale);
 
-  owlParamsSet1f(this->launchParams, "positionSigma",
-                 this->positionSigma);
-  owlParamsSet1f(this->launchParams, "tangentSigma",
-                 this->tangentSigma);
-  owlParamsSet1f(this->launchParams, "colorSigma",
-                 this->colorSigma);
-  owlParamsSet1f(this->launchParams, "thetaRange",
-                 this->thetaRange);
-  owlParamsSet1f(this->launchParams, "radiusScale",
-                 this->radiusScale);
-  owlParamsSet1f(this->launchParams, "weightThreshold",this->weightThreshold);
-
-  
-  
+  owlParamsSet1f(this->launchParams, "positionSigma", this->positionSigma);
+  owlParamsSet1f(this->launchParams, "tangentSigma", this->tangentSigma);
+  owlParamsSet1f(this->launchParams, "colorSigma", this->colorSigma);
+  owlParamsSet1f(this->launchParams, "thetaRange", this->thetaRange);
+  owlParamsSet1f(this->launchParams, "radiusScale", this->radiusScale);
+  owlParamsSet1f(this->launchParams, "weightThreshold", this->weightThreshold);
 
   // Upload integrator parameters
   owlParamsSet1b(this->launchParams, "MIS", this->currentScene.MIS);
@@ -455,24 +451,22 @@ void RenderWindowPT::initialize() {
   this->setWorldScale(this->sceneScale);
 }
 
-
-bool fileExists(const std::string& path) {
+bool fileExists(const std::string &path) {
   struct stat buffer;
   return (stat(path.c_str(), &buffer) == 0);
 }
 
-
-
-template<typename... Args>
-std::string stringFormat(const char* format, Args... args) {
+template <typename... Args>
+std::string stringFormat(const char *format, Args... args) {
   int size_s = std::snprintf(nullptr, 0, format, args...) + 1;
-  if (size_s <= 0) { throw std::runtime_error("Error during formatting."); }
-  auto                    size = static_cast<size_t>(size_s);
+  if (size_s <= 0) {
+    throw std::runtime_error("Error during formatting.");
+  }
+  auto size = static_cast<size_t>(size_s);
   std::unique_ptr<char[]> buf(new char[size]);
   std::snprintf(buf.get(), size, format, args...);
   return std::string(buf.get(), buf.get() + size - 1);
 }
-
 
 long long RenderWindowPT::render() {
   auto start = std::chrono::high_resolution_clock::now();
@@ -498,9 +492,9 @@ long long RenderWindowPT::render() {
                this->fbSize.x * this->fbSize.y * sizeof(DenoiseGBuffer),
                cudaMemcpyDeviceToDevice);
   }
-  if(denoiseEnabled)
-  owlLaunch2D(this->denoise, this->fbSize.x, this->fbSize.y,
-              this->launchParams);
+  if (denoiseEnabled)
+    owlLaunch2D(this->denoise, this->fbSize.x, this->fbSize.y,
+                this->launchParams);
 
   auto finish = std::chrono::high_resolution_clock::now();
 
@@ -549,7 +543,7 @@ void RenderWindowPT::drawUI() {
     ImGui::Checkbox("Denoise", &denoiseEnabled);
     if (denoiseEnabled != this->denoiseEnabled) {
       this->denoiseEnabled = denoiseEnabled;
-     this->cameraChanged();
+      this->cameraChanged();
     }
 
     if (!this->progressive) {
@@ -559,8 +553,6 @@ void RenderWindowPT::drawUI() {
         this->currentScene.spp = currentSpp;
         this->cameraChanged();
       }
-
-      
     }
 
     ImGui::SliderFloat("position sigma", &this->positionSigma, 0.f, 10.f);
@@ -570,12 +562,15 @@ void RenderWindowPT::drawUI() {
     ImGui::SliderFloat("radius scale", &this->radiusScale, 0.f, 100.f);
     ImGui::SliderFloat("weightThreshold", &this->weightThreshold, 0.f, 1.f);
     ImGui::SliderFloat("tangent threshold", &this->tangentThreshold, 0.f, 1.f);
-    ImGui::SliderFloat("fit delta threshold", &this->fitDeltaThreshold, 0.f, 10.f);
+    ImGui::SliderFloat("fit delta threshold", &this->fitDeltaThreshold, 0.f,
+                       10.f);
 
-   fitDeltaThreshold = (count++) * 0.02f;
-    if(count %3 == 0)
-   cameraChanged();
-   //  
+    if (scriptSave) {
+      fitDeltaThreshold = (count++) * 0.02f;
+      if (count % targetSpp == 0)
+        cameraChanged();
+    }
+
     ImGui::SliderInt("targetSpp", &this->targetSpp, 1, 64);
 
     owlParamsSet1f(this->launchParams, "positionSigma", this->positionSigma);
@@ -583,14 +578,17 @@ void RenderWindowPT::drawUI() {
     owlParamsSet1f(this->launchParams, "colorSigma", this->colorSigma);
     owlParamsSet1f(this->launchParams, "thetaRange", this->thetaRange);
     owlParamsSet1f(this->launchParams, "radiusScale", this->radiusScale);
-    owlParamsSet1f(this->launchParams, "weightThreshold", this->weightThreshold);
-    owlParamsSet1f(this->launchParams, "fitDeltaThreshold", this->fitDeltaThreshold);
-    owlParamsSet1i(this->launchParams,"debugMode",this->debugMode);
-    owlParamsSet1i(this->launchParams,"targetSpp",this->targetSpp);
+    owlParamsSet1f(this->launchParams, "weightThreshold",
+                   this->weightThreshold);
+    owlParamsSet1f(this->launchParams, "fitDeltaThreshold",
+                   this->fitDeltaThreshold);
+    owlParamsSet1i(this->launchParams, "debugMode", this->debugMode);
+    owlParamsSet1i(this->launchParams, "targetSpp", this->targetSpp);
 
     // ImGui::co
-    //Imgui 下拉列表
-    ImGui::Combo("Debug Mode", &this->debugMode, "None\0Normal\0Tangent\0Positionl\0Black\0");
+    // Imgui 下拉列表
+    ImGui::Combo("Debug Mode", &this->debugMode,
+                 "None\0Normal\0Tangent\0Positionl\0Black\0");
 
     // Sampling controls
     if (ImGui::CollapsingHeader("Sampling")) {
@@ -767,14 +765,28 @@ void RenderWindowPT::drawUI() {
       }
     }
 
-  //if (ImGui::Button("Save PNG")) {
-    if(count %3 == 0) {
+    if (scriptSave) {
+      if (count % targetSpp == 0) {
+        auto destPath = this->currentScene.renderOutput;
+        auto path = destPath.substr(0, destPath.find_last_of("."));
+        auto suffix = destPath.substr(destPath.find_last_of(".") + 1);
+        int count = 1;
+        while (fileExists(destPath)) {
+          destPath =
+              stringFormat("%s%d.%s", path.c_str(), count++, suffix.c_str());
+        }
+        this->screenShot(destPath);
+      }
+    }
+
+    if (ImGui::Button("Save PNG")) {
       auto destPath = this->currentScene.renderOutput;
       auto path = destPath.substr(0, destPath.find_last_of("."));
       auto suffix = destPath.substr(destPath.find_last_of(".") + 1);
       int count = 1;
       while (fileExists(destPath)) {
-        destPath = stringFormat("%s%d.%s", path.c_str(), count++, suffix.c_str());
+        destPath =
+            stringFormat("%s%d.%s", path.c_str(), count++, suffix.c_str());
       }
       this->screenShot(destPath);
     }
@@ -965,8 +977,8 @@ int main(int argc, char **argv) {
   if (argc >= 2)
     currentScene = std::string(argv[1]);
 
-  currentScene = "E:/code/HairMSNN/scenes/straight/config1.json";
-  
+  currentScene = "E:/code/HairMSNN/scenes/straight/config.json";
+
   LOG("Loading scene " + currentScene);
 
   Scene scene;

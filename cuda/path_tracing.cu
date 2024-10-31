@@ -16,6 +16,12 @@
 
 #include <optix_device.h>
 
+__device__
+bool needSelect(vec2i id) {
+    return true;
+    return abs(id.x - 360) <= 100 && abs(id.y - 617) <= 100;
+}
+
 OPTIX_RAYGEN_PROGRAM(rayGenCam)()
 {
     // ---------------------
@@ -23,6 +29,8 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
     // ---------------------
     const RayGenData& self = owl::getProgramData<RayGenData>();
     const vec2i pixelId = owl::getLaunchIndex();
+
+   
     int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
     
     // Pseudo-random number generator
@@ -56,6 +64,8 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
     vec3f color(0.f, 0.f, 0.f);
     int v1Stop = optixLaunchParams.pathV1 - 1;
     int v2Stop = optixLaunchParams.pathV2 - 1;
+
+
     
     if (si.hit == false) {
         color = si.Le;
@@ -103,7 +113,7 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
 }
 
 __device__
-double Distance(int x0, int y0, int x1, int y1) {
+double Distance(float x0, float y0, float x1, float y1) {
     float d = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
     // printf("Distance %d %d %d %d %f\n",x0,y0,x1,y1,d);
     return sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
@@ -122,7 +132,7 @@ __device__ bool AlmostZero(float v) {
 }
 
 __device__
-vec2i ComputeScreenSpace(vec3f position,vec3f dir_00,vec3f dir_du,vec3f dir_dv,vec3f center,vec2i frameBufferSize) {
+vec2f ComputeScreenSpace(vec3f position,vec3f dir_00,vec3f dir_du,vec3f dir_dv,vec3f center,vec2i frameBufferSize) {
     vec3f dir = center - position;
     dir = normalize(dir);
     float t = dot(dir,dir_00) / dot(dir_00,dir_00);
@@ -136,10 +146,9 @@ vec2i ComputeScreenSpace(vec3f position,vec3f dir_00,vec3f dir_du,vec3f dir_dv,v
 
     u+=0.5f;
     v+=0.5f;
+
+    return vec2f(u * frameBufferSize.x,v * frameBufferSize.y);
     
-    int centerx = int(u * frameBufferSize.x);
-    int centery = int(v * frameBufferSize.y);
-    return vec2i(centerx,centery);
 }
 
 __device__ vec2f projectDirectionToCameraView(const vec3f& direction, const vec3f& cameraDir00, const vec3f& cameraDirDU, const vec3f& cameraDirDV) {
@@ -156,6 +165,15 @@ __device__ vec2f projectDirectionToCameraView(const vec3f& direction, const vec3
     // v += 0.5f;
 
     return vec2f(u, v);
+
+
+    
+}
+
+__device__
+vec2f normalize(vec2f v) {
+    float l = sqrtf(v.x * v.x + v.y * v.y);
+    return v / l;
 }
 
 OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
@@ -172,16 +190,31 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
     
     if(optixLaunchParams.gBuffer[fbOfs].hit) {
         optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[fbOfs];
-      vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,optixLaunchParams.gBuffer[fbOfs].normal,optixLaunchParams.gBuffer[fbOfs].tangent,optixLaunchParams.gBuffer[fbOfs].radius * optixLaunchParams.radiusScale);
-      vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-      vec2i center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
-      vec2f screen_dir_xy = vec2f(center_screen_space.x,center_screen_space.y) - vec2f(pixelId.x,pixelId.y);
-      vec3f screen_dir = vec3f(screen_dir_xy.x,screen_dir_xy.y,0.f);
-      screen_dir = normalize(screen_dir);
-    //  screen_dir = 0.5f * screen_dir + 0.5f;
-      // if(optixLaunchParams.debugMode == VisualizeNormal)
-      //     optixLaunchParams.gBuffer->normal = screen_dir;
-      //   // optixLaunchParams.gBuffer[fbOfs].normal = screen_dir;
+        return;
+    //
+    //   vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,optixLaunchParams.gBuffer[fbOfs].normal,optixLaunchParams.gBuffer[fbOfs].tangent,optixLaunchParams.gBuffer[fbOfs].radius * optixLaunchParams.radiusScale);
+    //   vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
+    //   vec2f center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
+    //
+    //
+    //     // center_screen_space.y = 2 * pixelId.y - center_screen_space.y;
+    //     vec2f screen_dir_xy = vec2f(center_screen_space.x,center_screen_space.y) - vec2f(pixelId.x,pixelId.y);
+    //   vec3f screen_dir = vec3f(screen_dir_xy.x,screen_dir_xy.y,0.f);
+    //     
+    //   screen_dir = normalize(screen_dir);
+    //
+    //     vec2f tangentInScreen = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+    //     screen_dir = vec3f(tangentInScreen.x,tangentInScreen.y,0.f);
+    //     screen_dir = normalize(screen_dir);
+    //   //  screen_dir.y *= -1;
+    //    // screen_dir.y = 0.7;
+    //     
+    //     screen_dir = 0.5f * screen_dir + 0.5f;
+    //     writePixel(vec4f(screen_dir,1),self.frameBuffer,fbOfs);
+    // //  screen_dir = 0.5f * screen_dir + 0.5f;
+    //   // if(optixLaunchParams.debugMode == VisualizeNormal)
+    //   //     optixLaunchParams.gBuffer->normal = screen_dir;
+    //   //   // optixLaunchParams.gBuffer[fbOfs].normal = screen_dir;
       //   // optixLaunchParams.fittedGuffer[fbOfs].normal = screen_dir;
       //
       // vec2f normal_dir_xy = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
@@ -209,6 +242,8 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
     int m;
     int n;
 
+    int mCenter;
+    int nCenter;
     int validNeghborCount = 0;
 
     float delta = 0;
@@ -222,42 +257,40 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
                 continue;
             }
             
-            vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[ofs].position,optixLaunchParams.gBuffer[ofs].normal,optixLaunchParams.gBuffer[ofs].tangent,optixLaunchParams.gBuffer[ofs].radius * optixLaunchParams.radiusScale);
 
-            // vec3f dir = center - optixLaunchParams.camera.pos;
-            // //
+
             vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-            // dir = normalize(dir);
-            // float t = dot(dir,dir_00) / dot(dir_00,dir_00);
-            // float u = dot(dir,optixLaunchParams.camera.dir_du) / dot(optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_du) / t;
-            // float v = dot(dir,optixLaunchParams.camera.dir_dv) / dot(optixLaunchParams.camera.dir_dv,optixLaunchParams.camera.dir_dv) / t;
-            //
-            // u+=0.5f;
-            // v+=0.5f;
-            //
-            // int centerx = int(u * self.frameBufferSize.x);
-            // int centery = int(v * self.frameBufferSize.y);
+            vec2f tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[ofs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+            vec2f normalizedTangent = normalize(tangent);
+            vec2f normal(-normalizedTangent.y, normalizedTangent.x);
+
+            vec2f project_normal = projectDirectionToCameraView(optixLaunchParams.gBuffer[ofs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+            if(dot(normal,project_normal) < 0.f) {
+                normal = -normal;
+            }
+            float pI = i +0.5f;
+            float pJ = j + 0.5f;
+            float radius = 10.f;
+            float centerx = pI - normal.x * radius;
+            float centery = pJ - normal.y * radius;
             
-            //
-            vec2i center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
-            int centerx = center_screen_space.x;
-            int centery = center_screen_space.y;
+            float pPixelX = pixelId.x + 0.5f;
+            float pPixelY = pixelId.y + 0.5f;
             
-            delta = abs(Distance(i,j,centerx,centery) - Distance(pixelId.x,pixelId.y,centerx,centery));
-            float radius = Distance(i,j,centerx,centery);
+            delta = abs(Distance(pI,pJ,centerx,centery) - Distance(pPixelX,pPixelY,centerx,centery));
 
-            // delta = delta / radius;
-            //
-            // delta *= 10;
-
-          // printf("cent21e %d %d %d %d %f radius %f delta %f\n",centerx,centery,i,j,Distance(i,j,centerx,centery),optixLaunchParams.gBuffer[ofs].radius,delta);
-
-            // printf("%f\n" ,Distance(i,j,pixelId.x,pixelId.y));
-            if(delta < optixLaunchParams.fitDeltaThreshold &&  delta < minDistance) {
-                minDistance = delta;
+            if(delta == 0) {
+                //printf("center %f %f %f %f %f %f\n",pI,pJ,centerx,centery,Distance(pI,pJ,centerx,centery),radius);
+                // printf("PI PJ Pixel Center %f %f %f %f %f %f %f %f\n",pI,pJ,pPixelX,pPixelY,centerx,centery,Distance(pI,pJ,centerx,centery),Distance(pPixelX,pPixelY,centerx,centery));
+            }
+            
+            if(delta < optixLaunchParams.fitDeltaThreshold &&  Distance(i,j,centerx,centery) < minDistance) {
+                minDistance = Distance(i,j,centerx,centery);
                 // printf("minDistance %f\n",minDistance);
                 m = i;
                 n = j;
+                mCenter = centerx;
+                nCenter = centery;
             }
         }
     }
@@ -269,7 +302,13 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
         optixLaunchParams.gBuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
         optixLaunchParams.fittedGuffer[fbOfs].from_it = true;
         optixLaunchParams.gBuffer[fbOfs].from_it = true;
-        // optixLaunchParams.averageBuffer[fbOfs] = optixLaunchParams.averageBuffer[ofs];
+
+        if(optixLaunchParams.debugMode == VisualizeBlack) {
+            writePixel(vec4f(delta/10.f),self.frameBuffer,fbOfs);
+        }
+        if(optixLaunchParams.debugMode == VisualizePosition){
+            writePixel(vec4f((mCenter)/1000.f,(nCenter)/1000.f,0.f,1.f),self.frameBuffer,fbOfs);
+        }
         optixLaunchParams.denoiseBuffer[fbOfs] = optixLaunchParams.denoiseBuffer[ofs];
     }
     else {
@@ -343,16 +382,31 @@ OPTIX_RAYGEN_PROGRAM(denoise)(){
     //
     // int centerx = int(ceneter_screen_space.x * self.frameBufferSize.x);
     // int centery = int(ceneter_screen_space.y * self.frameBufferSize.y);
-    vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-    vec2i center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
-    int centerx = center_screen_space.x;
-    int centery = center_screen_space.y;
+    // vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
+    // vec2f center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
+    // int centerx = center_screen_space.x;
+    // int centery = center_screen_space.y;
 
    // printf("center %d %d %d %d\n",centerx,centery,pixelId.x,pixelId.y);
 
     int pi = pixelId.x;
     int pj = pixelId.y;
-    float radius = Distance(pi,pj,centerx,centery);
+
+    vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
+    vec2f tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+    vec2f normalizedTangent = normalize(tangent);
+    vec2f normal(-normalizedTangent.y, normalizedTangent.x);
+    vec2f project_normal = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+    if(dot(normal,project_normal) < 0.f) {
+        normal = -normal;
+    }
+    float pI = pi +0.5f;
+    float pJ = pj + 0.5f;
+    float radius = 0.1f * optixLaunchParams.radiusScale;
+    float centerx = pI - normal.x * radius;
+    float centery = pJ - normal.y * radius;
+
+    
   // printf("center %d %d %d %d %f\n",pi,pj,centerx,centery,radius);
     // radius = max(radius,5.f);
     float theta = calculateTheta(vec2f(centerx,centery),vec2f(pi,pj));
@@ -421,8 +475,14 @@ OPTIX_RAYGEN_PROGRAM(denoise)(){
     else
         color = centerColor;
 
-    if(optixLaunchParams.debugMode == VisualizeNormal)
+    if(optixLaunchParams.debugMode == VisualizeNormal) {
         color = 0.5f * optixLaunchParams.gBuffer[fbOfs].normal + 0.5f;
+        vec2f screen_tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+        screen_tangent = normalize(screen_tangent);
+        color = 0.5f * vec3f(screen_tangent.x,screen_tangent.y,0.f) + 0.5f;
+        writePixel(vec4f(color,1),self.frameBuffer,fbOfs);
+        return;
+    }
     if(optixLaunchParams.debugMode == VisualizeTangent)
         color = 0.5f * optixLaunchParams.gBuffer[fbOfs].tangent + 0.5f;
     if(optixLaunchParams.debugMode == VisualizePosition)
@@ -439,6 +499,11 @@ OPTIX_RAYGEN_PROGRAM(denoise)(){
     optixLaunchParams.accumBuffer[fbOfs].x -= centerColor.x;
     optixLaunchParams.accumBuffer[fbOfs].y -= centerColor.y;
     optixLaunchParams.accumBuffer[fbOfs].z -= centerColor.z;
+
+    // if(!needSelect(pixelId)) {
+    //     writePixel(vec4f(0,0,0,1),self.frameBuffer,fbOfs);
+    //     return;
+    // }
     
     writePixel(color, optixLaunchParams.accumId,
        self.frameBuffer,

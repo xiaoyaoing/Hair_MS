@@ -598,6 +598,11 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
     si.hit = true;
     si.isSurface = false;
 
+    // if(si.hair.hair_strand_index < 400 || si.hair.hair_strand_index>500) {
+    //     si.hit = false;
+    //     si.isSurface = false;
+    // }
+
     setupHairShading(si);
 }
 
