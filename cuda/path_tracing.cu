@@ -61,6 +61,7 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
         color = si.Le;
         optixLaunchParams.gBuffer[fbOfs] = DenoiseGBuffer();
         optixLaunchParams.fittedGuffer[fbOfs] = DenoiseGBuffer();
+        optixLaunchParams.gBuffer[fbOfs].from_it = false;
     }
     else {
         color = pathTrace(si, rng, v1Stop, v2Stop);
@@ -68,11 +69,12 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
         // if(accumId == 0) {
             optixLaunchParams.gBuffer[fbOfs].normal = si.n;
             optixLaunchParams.gBuffer[fbOfs].tangent = si.t;
-            optixLaunchParams.gBuffer[fbOfs].radius = si.hair.radius;
+            optixLaunchParams.gBuffer[fbOfs].radius = si.hair.radius_by_compute;
             optixLaunchParams.gBuffer[fbOfs].color = si.color;
             optixLaunchParams.gBuffer[fbOfs].position = si.p;
             optixLaunchParams.gBuffer[fbOfs].strand_index = si.hair.hair_strand_index;
             optixLaunchParams.gBuffer[fbOfs].hit = true;
+            optixLaunchParams.gBuffer[fbOfs].from_it = false;
         // }
         // else {
         //     optixLaunchParams.gBuffer[fbOfs].normal = (optixLaunchParams.gBuffer[fbOfs].normal * accumId + si.n) / (accumId + 1);
@@ -92,12 +94,12 @@ OPTIX_RAYGEN_PROGRAM(rayGenCam)()
         optixLaunchParams.averageBuffer,
         fbOfs);
     optixLaunchParams.denoiseBuffer[fbOfs] = make_float4(color.x,color.y,color.z,1.0f);
-    if(optixLaunchParams.debugMode == VisualizeNormal) {
-        optixLaunchParams.gBuffer[fbOfs].normal.x = optixLaunchParams.averageBuffer[fbOfs].x *2 -1;
-        optixLaunchParams.gBuffer[fbOfs].normal.y = optixLaunchParams.averageBuffer[fbOfs].y * 2-1;
-        optixLaunchParams.gBuffer[fbOfs].normal.z = optixLaunchParams.averageBuffer[fbOfs].z * 2 -1;
-    }
-    
+    // if(optixLaunchParams.debugMode == VisualizeNormal) {
+    //     optixLaunchParams.gBuffer[fbOfs].normal.x = optixLaunchParams.averageBuffer[fbOfs].x *2 -1;
+    //     optixLaunchParams.gBuffer[fbOfs].normal.y = optixLaunchParams.averageBuffer[fbOfs].y * 2-1;
+    //     optixLaunchParams.gBuffer[fbOfs].normal.z = optixLaunchParams.averageBuffer[fbOfs].z * 2 -1;
+    // }
+    //
 }
 
 __device__
@@ -111,7 +113,7 @@ double Distance(int x0, int y0, int x1, int y1) {
 __device__
 vec3f ComputeSphereCenter(vec3f position,vec3f normal,vec3f tangent,float radius) {
     // return position;
-    vec3f center = position + radius * normal;
+    vec3f center = position - radius * normal;
     return center;
 }
 
@@ -140,20 +142,65 @@ vec2i ComputeScreenSpace(vec3f position,vec3f dir_00,vec3f dir_du,vec3f dir_dv,v
     return vec2i(centerx,centery);
 }
 
+__device__ vec2f projectDirectionToCameraView(const vec3f& direction, const vec3f& cameraDir00, const vec3f& cameraDirDU, const vec3f& cameraDirDV) {
+    // Normalize the direction vector
+    vec3f dir = normalize(direction);
+
+    // Compute the screen space coordinates
+    float t = dot(dir, cameraDir00) / dot(cameraDir00, cameraDir00);
+    float u = dot(dir, cameraDirDU) / dot(cameraDirDU, cameraDirDU) / t;
+    float v = dot(dir, cameraDirDV) / dot(cameraDirDV, cameraDirDV) / t;
+
+    // // Adjust to screen space
+    // u += 0.5f;
+    // v += 0.5f;
+
+    return vec2f(u, v);
+}
+
 OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
     const RayGenData& self = owl::getProgramData<RayGenData>();
     const vec2i pixelId = owl::getLaunchIndex();
     int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
-    int leftx = max(0, pixelId.x - 1);
-    int rightx = min(self.frameBufferSize.x - 1, pixelId.x + 1);
-    int upy = max(0, pixelId.y - 1);
-    int downy = min(self.frameBufferSize.y - 1, pixelId.y + 1);
+    int leftx = max(0, pixelId.x - 2);
+    int rightx = min(self.frameBufferSize.x - 1, pixelId.x + 2);
+    int upy = max(0, pixelId.y - 2);
+    int downy = min(self.frameBufferSize.y - 1, pixelId.y + 2);
 
 
   //  printf("Fitting pixel %d %d\n",pixelId.x,pixelId.y);
     
     if(optixLaunchParams.gBuffer[fbOfs].hit) {
         optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[fbOfs];
+      vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,optixLaunchParams.gBuffer[fbOfs].normal,optixLaunchParams.gBuffer[fbOfs].tangent,optixLaunchParams.gBuffer[fbOfs].radius * optixLaunchParams.radiusScale);
+      vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
+      vec2i center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
+      vec2f screen_dir_xy = vec2f(center_screen_space.x,center_screen_space.y) - vec2f(pixelId.x,pixelId.y);
+      vec3f screen_dir = vec3f(screen_dir_xy.x,screen_dir_xy.y,0.f);
+      screen_dir = normalize(screen_dir);
+    //  screen_dir = 0.5f * screen_dir + 0.5f;
+      // if(optixLaunchParams.debugMode == VisualizeNormal)
+      //     optixLaunchParams.gBuffer->normal = screen_dir;
+      //   // optixLaunchParams.gBuffer[fbOfs].normal = screen_dir;
+      //   // optixLaunchParams.fittedGuffer[fbOfs].normal = screen_dir;
+      //
+      // vec2f normal_dir_xy = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+      // screen_dir = vec3f(normal_dir_xy.x,normal_dir_xy.y,0.f);
+      // screen_dir = normalize(screen_dir);
+      //   //
+      //   if(optixLaunchParams.debugMode == VisualizeNormal)
+      //       screen_dir = optixLaunchParams.gBuffer[fbOfs].normal * 0.5f + 0.5f;
+      // //
+      // //  screen_dir = optixLaunchParams.gBuffer[fbOfs].normal;// * 0.5f + 0.5f;
+      // //  screen_dir = 0.5f * screen_dir + 0.5f;
+      //
+      //  // printf("Normal %f %f %f\n",screen_dir.x,screen_dir.y,screen_dir.z);
+      //
+      //   writePixel(screen_dir, optixLaunchParams.accumId,
+      //   self.frameBuffer,
+      //   optixLaunchParams.accumBuffer,
+      //   optixLaunchParams.averageBuffer,
+      //   fbOfs);
         return;
     }
     // printf("Fitting pixel %d %d\n",pixelId.x,pixelId.y);
@@ -163,7 +210,8 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
     int n;
 
     int validNeghborCount = 0;
-    
+
+    float delta = 0;
     for (int i = leftx; i <= rightx; i++) {
         for (int j = upy; j <= downy; j++) {
             if(i == pixelId.x && j == pixelId.y) {
@@ -195,13 +243,18 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
             int centerx = center_screen_space.x;
             int centery = center_screen_space.y;
             
-            float delta = abs(Distance(i,j,centerx,centery) - Distance(pixelId.x,pixelId.y,centerx,centery));
+            delta = abs(Distance(i,j,centerx,centery) - Distance(pixelId.x,pixelId.y,centerx,centery));
+            float radius = Distance(i,j,centerx,centery);
+
+            // delta = delta / radius;
+            //
+            // delta *= 10;
 
           // printf("cent21e %d %d %d %d %f radius %f delta %f\n",centerx,centery,i,j,Distance(i,j,centerx,centery),optixLaunchParams.gBuffer[ofs].radius,delta);
 
             // printf("%f\n" ,Distance(i,j,pixelId.x,pixelId.y));
-            if(delta < optixLaunchParams.fitDeltaThreshold &&  Distance(i,j,centerx,centery) < minDistance) {
-                minDistance = Distance(i,j,centerx,centery);
+            if(delta < optixLaunchParams.fitDeltaThreshold &&  delta < minDistance) {
+                minDistance = delta;
                 // printf("minDistance %f\n",minDistance);
                 m = i;
                 n = j;
@@ -214,11 +267,17 @@ OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
         int ofs = m + self.frameBufferSize.x * n;
         optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
         optixLaunchParams.gBuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
-        //optixLaunchParams.averageBuffer[fbOfs] = optixLaunchParams.averageBuffer[ofs];
+        optixLaunchParams.fittedGuffer[fbOfs].from_it = true;
+        optixLaunchParams.gBuffer[fbOfs].from_it = true;
+        // optixLaunchParams.averageBuffer[fbOfs] = optixLaunchParams.averageBuffer[ofs];
+        optixLaunchParams.denoiseBuffer[fbOfs] = optixLaunchParams.denoiseBuffer[ofs];
     }
     else {
         optixLaunchParams.fittedGuffer[fbOfs].strand_index = -100;
+    }
 
+    {
+        
     }
 }
 
@@ -337,6 +396,12 @@ OPTIX_RAYGEN_PROGRAM(denoise)(){
             curTheta += deltaTheta;
             continue;
         }
+        // if(curI == pi && curJ == pj) {
+            if(optixLaunchParams.gBuffer[curOfs].from_it) {
+                curTheta += deltaTheta;
+                continue;
+            }
+        // }
         vec3f curpixelColor = vec3f(optixLaunchParams.denoiseBuffer[curOfs]);
         float weight = GetFilterWeight(optixLaunchParams.gBuffer[fbOfs],optixLaunchParams.gBuffer[curOfs],curpixelColor,centerColor,pixelId,vec2i(curI,curJ));
 

@@ -2,26 +2,33 @@
     "camera": {
         "cos_fovy": 0.6600000262260437,
         "from": [
-            -218.175446, 56.984848, 45.4866982
+            -218.175446,
+            56.984848,
+            45.4866982
         ],
         "to": [
-            2.0, 80, 0.0
+            2.0,
+            80,
+            0.0
         ],
         "up": [
-            0,1,0
+            0,
+            1,
+            0
         ]
     },
+    "camera_path": [],
     "hair": {
         "alpha": 2.0,
         "beta_m": 0.3,
         "beta_n": 0.3,
-        "type": 1,
+        "geometry": "E:\\code\\vkhr1\\share\\styles\\ponytail.hair",
         "sigma_a": [
             0.24,
             0.51,
             1.36
         ],
-        "geometry": "E:\\code\\vkhr1\\share\\styles\\ponytail.hair"
+        "type": 1
     },
     "integrator": {
         "ENV_PDF": true,

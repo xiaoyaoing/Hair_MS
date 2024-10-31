@@ -517,6 +517,8 @@ void RenderWindowPT::resize(const vec2i &newSize) {
   }
 }
 
+static int count = 0;
+
 void RenderWindowPT::drawUI() {
   ImGui_ImplOpenGL2_NewFrame();
   ImGui_ImplGlfw_NewFrame();
@@ -569,6 +571,11 @@ void RenderWindowPT::drawUI() {
     ImGui::SliderFloat("weightThreshold", &this->weightThreshold, 0.f, 1.f);
     ImGui::SliderFloat("tangent threshold", &this->tangentThreshold, 0.f, 1.f);
     ImGui::SliderFloat("fit delta threshold", &this->fitDeltaThreshold, 0.f, 10.f);
+
+   fitDeltaThreshold = (count++) * 0.02f;
+    if(count %3 == 0)
+   cameraChanged();
+   //  
     ImGui::SliderInt("targetSpp", &this->targetSpp, 1, 64);
 
     owlParamsSet1f(this->launchParams, "positionSigma", this->positionSigma);
@@ -760,7 +767,8 @@ void RenderWindowPT::drawUI() {
       }
     }
 
-    if (ImGui::Button("Save PNG")) {
+  //if (ImGui::Button("Save PNG")) {
+    if(count %3 == 0) {
       auto destPath = this->currentScene.renderOutput;
       auto path = destPath.substr(0, destPath.find_last_of("."));
       auto suffix = destPath.substr(destPath.find_last_of(".") + 1);
@@ -770,7 +778,6 @@ void RenderWindowPT::drawUI() {
       }
       this->screenShot(destPath);
     }
-
     if (ImGui::Button("Save EXR")) {
       std::string exrFile = this->currentScene.renderOutput;
       size_t pos = exrFile.find(".png");

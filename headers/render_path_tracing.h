@@ -55,8 +55,8 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
 
     bool sbtDirty = true;
     bool progressive = true;
-    bool fitGBuffer = false;
-    bool denoiseEnabled = false;
+    bool fitGBuffer = true;
+    bool denoiseEnabled = true;
 
     OWLRayGen rayGen{ 0 };
     OWLRayGen fitGBufferPass{0};
@@ -80,7 +80,7 @@ struct RenderWindowPT : public owl::viewer::OWLViewer
     float weightThreshold = 0.15f;
     float tangentThreshold = 0.9f;
     float fitDeltaThreshold = 1.5f;
-    int targetSpp = 1;
+    int targetSpp = 3;
     
 
     // Hair geometry and its parameters

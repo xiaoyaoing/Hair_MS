@@ -19,6 +19,7 @@ struct DenoiseGBuffer {
 	uint32_t strand_index;
 	bool hit;
 	float radius;
+	bool from_it;
 };
 
 struct LaunchParams {

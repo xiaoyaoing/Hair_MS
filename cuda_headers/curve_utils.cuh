@@ -213,17 +213,17 @@ __forceinline__ vec3f curveTangent(const CurveType& bc, float u)
     return normalize(tangent);
 }
 
-// static __forceinline__ __device__
-//  float computeCurvatureRadius(const vec3f& p1, const vec3f& t1, const vec3f& p2, const vec3f& t2) {
-//     vec3f a = normalize(p2 - p1);
-//     float curvature = length(cross(t1,a)) / powf(dot(a, a), 1.5f);
-//     return 1.0f / curvature;
-// }
+static __forceinline__ __device__
+ float computeCurvatureRadius(const vec3f& p1, const vec3f& t1, const vec3f& p2, const vec3f& t2) {
+    vec3f a = normalize(p2 - p1);
+    float curvature = length(cross(t1,a)) / powf(dot(a, a), 1.5f);
+    return 1.0f / curvature;
+}
 
 /*! compute normal - stolen from optixHair sample in OptiX 7.4 SDK */
 // Compute surface normal of quadratic pimitive in world space.
 static __forceinline__ __device__
-void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3f& t, vec3f& c, float& radius)
+void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3f& t, vec3f& c, float& radius,float & radius_by_compute,vec3f w)
 {
     const OptixTraversableHandle gas = optixGetGASTraversableHandle();
     const unsigned int           gasSbtIndex = optixGetSbtGASIndex();
@@ -243,10 +243,25 @@ void computeCurveIntersection(const int primitiveIndex, vec3f& p, vec3f& n, vec3
     p = getHitPoint();
     radius = interpolator.radius(u);
 
+    float min_u = fmaxf(u - 0.01f, 0.0f);
+    float max_u = fminf(u + 0.01f, 1.0f);
+    radius_by_compute = computeCurvatureRadius(interpolator.position3(min_u), interpolator.velocity3(min_u), interpolator.position3(max_u), interpolator.velocity3(max_u));
+
+    radius_by_compute = fmaxf(radius_by_compute, 100.f);
+    radius_by_compute = radius;
+    
+    // printf("radius: %f\n", radius);
+    
     n = surfaceNormal(interpolator, u, p);
+
+    
     n = normalize(n);
 
     t = curveTangent(interpolator, u);
+
+    vec3f tangent  = -t;
+    // n = normalize((w - tangent * dot(tangent, w)));
+
 #else
     vec4f controlPoints[2];
     optixGetLinearCurveVertexData(gas, primitiveIndex, gasSbtIndex, 0.0f, (float4*)controlPoints);

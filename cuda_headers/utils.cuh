@@ -10,6 +10,15 @@
 #define Pi 3.1415926f
 #define TWO_Pi 2.f * 3.14159f
 
+__device__ __forceinline__
+float my_linear_to_srgb(float x)
+{
+    return x;
+    if (x <= 0.0031308f)
+        return 12.92f * x;
+    return 1.055f * pow(x, 1.f / 2.4f) - 0.055f;
+}
+
 __device__
 void writePixel(vec3f& color, int accumId,
     uint32_t* frameBuffer, 
@@ -22,9 +31,9 @@ void writePixel(vec3f& color, int accumId,
 
     if(accumId > optixLaunchParams.targetSpp) {
         float4 c = averageBuffer[offset];
-        frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(c.x),
-            linear_to_srgb(c.y),
-            linear_to_srgb(c.z)));
+        frameBuffer[offset] = owl::make_rgba(vec3f(my_linear_to_srgb(c.x),
+            my_linear_to_srgb(c.y),
+            my_linear_to_srgb(c.z)));
         return;
     }
 
@@ -37,17 +46,17 @@ void writePixel(vec3f& color, int accumId,
     color = (1.f / (accumId + 1)) * color;
 
     averageBuffer[offset] = vec4f(color, 1.0);
-    frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(color.x),
-        linear_to_srgb(color.y),
-        linear_to_srgb(color.z)));
+    frameBuffer[offset] = owl::make_rgba(vec3f(my_linear_to_srgb(color.x),
+        my_linear_to_srgb(color.y),
+        my_linear_to_srgb(color.z)));
 }
 
 __device__
 void writePixel(float4 * denoiseBuffer, uint32_t* frameBuffer,int offset) {
     vec4f color = vec4f(denoiseBuffer[offset]);
-    frameBuffer[offset] = owl::make_rgba(vec3f(linear_to_srgb(color.x),
-        linear_to_srgb(color.y),
-        linear_to_srgb(color.z)));
+    frameBuffer[offset] = owl::make_rgba(vec3f(my_linear_to_srgb(color.x),
+        my_linear_to_srgb(color.y),
+        my_linear_to_srgb(color.z)));
 }
 
 __device__ __forceinline__

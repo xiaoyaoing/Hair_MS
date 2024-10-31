@@ -36,6 +36,7 @@ struct HairInteraction {
 
 	vec3f curve_p = vec3f(0.f);
 	float radius = 0.f;
+	float radius_by_compute = 0.f;
 	float v[3] = { 0.f };
 	float s = 0.f;
 

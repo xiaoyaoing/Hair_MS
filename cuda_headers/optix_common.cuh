@@ -567,7 +567,7 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
         si.n,
         si.t,
         si.hair.curve_p,
-        si.hair.radius);
+        si.hair.radius,si.hair.radius_by_compute,si.wo);
 
     si.hair.hair_strand_index = primIdx;
 
