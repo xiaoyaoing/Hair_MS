@@ -16,498 +16,562 @@
 
 #include <optix_device.h>
 
-__device__
-bool needSelect(vec2i id) {
-    return true;
-    return abs(id.x - 360) <= 100 && abs(id.y - 617) <= 100;
+__device__ bool needSelect(vec2i id) {
+  return true;
+  return abs(id.x - 360) <= 100 && abs(id.y - 617) <= 100;
 }
 
-OPTIX_RAYGEN_PROGRAM(rayGenCam)()
-{
-    // ---------------------
-    // Path Tracing
-    // ---------------------
-    const RayGenData& self = owl::getProgramData<RayGenData>();
-    const vec2i pixelId = owl::getLaunchIndex();
-
-   
-    int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
-    
-    // Pseudo-random number generator
-    LCGRand rng = get_rng(optixLaunchParams.accumId + 10007, make_uint2(pixelId.x, pixelId.y),
-        make_uint2(self.frameBufferSize.x, self.frameBufferSize.y));
-    
-    // Shoot camera ray
-    vec2f pixelOffset = vec2f(lcg_randomf(rng), lcg_randomf(rng));
-    if(optixLaunchParams.targetSpp == 1)
-        pixelOffset = vec2f(0.5f,0.5f);
-    const vec2f screen = (vec2f(pixelId) + pixelOffset) / vec2f(self.frameBufferSize);
-    
-    RadianceRay ray;
-    ray.origin
-        = optixLaunchParams.camera.pos;
-    ray.direction
-        = normalize(optixLaunchParams.camera.dir_00
-            + screen.u * optixLaunchParams.camera.dir_du
-            + screen.v * optixLaunchParams.camera.dir_dv);
-
-    // printf("RayGen %d %d\n",pixelId.x,pixelId.y);
-                    
-    
-    Interaction si;
-    si.hit = false;
-    si.wo = -1.f * ray.direction;
-    si.wi = ray.direction;
-    
-    owl::traceRay(optixLaunchParams.world, ray, si);
-    
-    vec3f color(0.f, 0.f, 0.f);
-    int v1Stop = optixLaunchParams.pathV1 - 1;
-    int v2Stop = optixLaunchParams.pathV2 - 1;
+__device__ vec2f normalize(vec2f v) {
+  float l = sqrtf(v.x * v.x + v.y * v.y);
+  return v / l;
+}
 
 
-    
-    if (si.hit == false) {
-        color = si.Le;
-        optixLaunchParams.gBuffer[fbOfs] = DenoiseGBuffer();
-        optixLaunchParams.fittedGuffer[fbOfs] = DenoiseGBuffer();
-        optixLaunchParams.gBuffer[fbOfs].from_it = false;
-    }
-    else {
-        color = pathTrace(si, rng, v1Stop, v2Stop);
-        uint32_t accumId = optixLaunchParams.accumId;
-        // if(accumId == 0) {
-            optixLaunchParams.gBuffer[fbOfs].normal = si.n;
-            optixLaunchParams.gBuffer[fbOfs].tangent = si.t;
-            optixLaunchParams.gBuffer[fbOfs].radius = si.hair.radius_by_compute;
-            optixLaunchParams.gBuffer[fbOfs].color = si.color;
-            optixLaunchParams.gBuffer[fbOfs].position = si.p;
-            optixLaunchParams.gBuffer[fbOfs].strand_index = si.hair.hair_strand_index;
-            optixLaunchParams.gBuffer[fbOfs].hit = true;
-            optixLaunchParams.gBuffer[fbOfs].from_it = false;
-        // }
-        // else {
-        //     optixLaunchParams.gBuffer[fbOfs].normal = (optixLaunchParams.gBuffer[fbOfs].normal * accumId + si.n) / (accumId + 1);
-        //     
-        // }
+__device__ vec2f projectDirectionToCameraView(const vec3f &direction,
+                                              const vec3f &cameraDir00,
+                                              const vec3f &cameraDirDU,
+                                              const vec3f &cameraDirDV) {
+  // Normalize the direction vector
+  vec3f dir = normalize(direction);
 
-      //  printf("strand %d normal %f %f %f tangent %f %f %f\n",si.hair.hair_strand_index,si.n.x,si.n.y,si.n.z,si.t.x,si.t.y,si.t.z);
-        // optixLaunchParams.denoiseGBuffer[fbOfs].strand_index = si.hair.
-    }
+  // Compute the screen space coordinates
+  float t = dot(dir, cameraDir00) / dot(cameraDir00, cameraDir00);
+  float u = dot(dir, cameraDirDU) / dot(cameraDirDU, cameraDirDU) / t;
+  float v = dot(dir, cameraDirDV) / dot(cameraDirDV, cameraDirDV) / t;
 
-    if(optixLaunchParams.debugMode == VisualizeNormal) {
-        color = 0.5f * si.n + 0.5f;
-    }
-    writePixel(color, optixLaunchParams.accumId,
-        self.frameBuffer,
-        optixLaunchParams.accumBuffer,
-        optixLaunchParams.averageBuffer,
-        fbOfs);
-    optixLaunchParams.denoiseBuffer[fbOfs] = make_float4(color.x,color.y,color.z,1.0f);
-    // if(optixLaunchParams.debugMode == VisualizeNormal) {
-    //     optixLaunchParams.gBuffer[fbOfs].normal.x = optixLaunchParams.averageBuffer[fbOfs].x *2 -1;
-    //     optixLaunchParams.gBuffer[fbOfs].normal.y = optixLaunchParams.averageBuffer[fbOfs].y * 2-1;
-    //     optixLaunchParams.gBuffer[fbOfs].normal.z = optixLaunchParams.averageBuffer[fbOfs].z * 2 -1;
+  // // Adjust to screen space
+  // u += 0.5f;
+  // v += 0.5f;
+
+  return vec2f(u, v);
+}
+
+OPTIX_RAYGEN_PROGRAM(rayGenCam)() {
+  // ---------------------
+  // Path Tracing
+  // ---------------------
+  const RayGenData &self = owl::getProgramData<RayGenData>();
+  const vec2i pixelId = owl::getLaunchIndex();
+
+  int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
+
+  // Pseudo-random number generator
+  LCGRand rng = get_rng(
+      optixLaunchParams.accumId + 10007, make_uint2(pixelId.x, pixelId.y),
+      make_uint2(self.frameBufferSize.x, self.frameBufferSize.y));
+
+  // Shoot camera ray
+  vec2f pixelOffset = vec2f(lcg_randomf(rng), lcg_randomf(rng));
+  if (optixLaunchParams.targetSpp == 1)
+    pixelOffset = vec2f(0.5f, 0.5f);
+  const vec2f screen =
+      (vec2f(pixelId) + pixelOffset) / vec2f(self.frameBufferSize);
+
+  RadianceRay ray;
+  ray.origin = optixLaunchParams.camera.pos;
+  ray.direction = normalize(optixLaunchParams.camera.dir_00 +
+                            screen.u * optixLaunchParams.camera.dir_du +
+                            screen.v * optixLaunchParams.camera.dir_dv);
+
+  // printf("RayGen %d %d\n",pixelId.x,pixelId.y);
+
+  Interaction si;
+  si.hit = false;
+  si.wo = -1.f * ray.direction;
+  si.wi = ray.direction;
+
+  owl::traceRay(optixLaunchParams.world, ray, si);
+
+  vec3f color(0.f, 0.f, 0.f);
+  int v1Stop = optixLaunchParams.pathV1 - 1;
+  int v2Stop = optixLaunchParams.pathV2 - 1;
+
+  if (si.hit == false) {
+    color = si.Le;
+    optixLaunchParams.gBuffer[fbOfs] = DenoiseGBuffer();
+    optixLaunchParams.fittedGuffer[fbOfs] = DenoiseGBuffer();
+    optixLaunchParams.gBuffer[fbOfs].from_it = false;
+  } else {
+    color = pathTrace(si, rng, v1Stop, v2Stop);
+    uint32_t accumId = optixLaunchParams.accumId;
+    // if(accumId == 0) {
+    optixLaunchParams.gBuffer[fbOfs].normal = si.n;
+    optixLaunchParams.gBuffer[fbOfs].tangent = si.t;
+    optixLaunchParams.gBuffer[fbOfs].radius = si.hair.radius_by_compute;
+    optixLaunchParams.gBuffer[fbOfs].color = si.color;
+    optixLaunchParams.gBuffer[fbOfs].position = si.p;
+    optixLaunchParams.gBuffer[fbOfs].strand_index = si.hair.hair_strand_index;
+    optixLaunchParams.gBuffer[fbOfs].hit = true;
+    optixLaunchParams.gBuffer[fbOfs].from_it = false;
     // }
+    // else {
+    //     optixLaunchParams.gBuffer[fbOfs].normal =
+    //     (optixLaunchParams.gBuffer[fbOfs].normal * accumId + si.n) / (accumId
+    //     + 1);
     //
-}
-
-__device__
-double Distance(float x0, float y0, float x1, float y1) {
-    float d = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
-    // printf("Distance %d %d %d %d %f\n",x0,y0,x1,y1,d);
-    return sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
-}
-
-
-__device__
-vec3f ComputeSphereCenter(vec3f position,vec3f normal,vec3f tangent,float radius) {
-    // return position;
-    vec3f center = position - radius * normal;
-    return center;
-}
-
-__device__ bool AlmostZero(float v) {
-    return abs(v) < 1e-6f;
-}
-
-__device__
-vec2f ComputeScreenSpace(vec3f position,vec3f dir_00,vec3f dir_du,vec3f dir_dv,vec3f center,vec2i frameBufferSize) {
-    vec3f dir = center - position;
-    dir = normalize(dir);
-    float t = dot(dir,dir_00) / dot(dir_00,dir_00);
-    float u = dot(dir,dir_du) / dot(dir_du,dir_du) / t;
-    float v = dot(dir,dir_dv) / dot(dir_dv,dir_dv) / t;
-
-    // if( AlmostZero(u) || AlmostZero(v)) {
-    //     printf("dir %f %f %f dir_00 %f %f %f dir_du %f %f %f dir_dv %f %f %f\n",dir.x,dir.y,dir.z,dir_00.x,dir_00.y,dir_00.z,dir_du.x,dir_du.y,dir_du.z,dir_dv.x,dir_dv.y,dir_dv.z);
-    //     printf("center position %f %f %f %f %f %f %f %f %f\n",center.x,center.y,center.z,position.x,position.y,position.z,dir.x,dir.y,dir.z);
     // }
 
-    u+=0.5f;
-    v+=0.5f;
+    //  printf("strand %d normal %f %f %f tangent %f %f
+    //  %f\n",si.hair.hair_strand_index,si.n.x,si.n.y,si.n.z,si.t.x,si.t.y,si.t.z);
+    // optixLaunchParams.denoiseGBuffer[fbOfs].strand_index = si.hair.
+  }
 
-    return vec2f(u * frameBufferSize.x,v * frameBufferSize.y);
-    
+  if (optixLaunchParams.debugMode == VisualizeNormal) {
+    color = 0.5f * si.n + 0.5f;
+  }
+  writePixel(color, optixLaunchParams.accumId, self.frameBuffer,
+             optixLaunchParams.accumBuffer, optixLaunchParams.averageBuffer,
+             fbOfs);
+  optixLaunchParams.denoiseBuffer[fbOfs] =
+      make_float4(color.x, color.y, color.z, 1.0f);
+
+  if(optixLaunchParams.debugMode == VisualizeTangent) {
+    vec3f dir_00 = optixLaunchParams.camera.dir_00 +
+                  0.5f * (optixLaunchParams.camera.dir_du +
+                          optixLaunchParams.camera.dir_dv);
+    vec2f tangent = projectDirectionToCameraView(
+        optixLaunchParams.gBuffer[fbOfs].tangent, dir_00,
+        optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+    tangent = normalize(tangent);
+    tangent = 0.5f * tangent + 0.5f;
+    writePixel(vec4f(tangent.x,tangent.y,0,1), self.frameBuffer, fbOfs);
+  }
+
+  // if(optixLaunchParams.debugMode == VisualizeNormal) {
+  //     optixLaunchParams.gBuffer[fbOfs].normal.x =
+  //     optixLaunchParams.averageBuffer[fbOfs].x *2 -1;
+  //     optixLaunchParams.gBuffer[fbOfs].normal.y =
+  //     optixLaunchParams.averageBuffer[fbOfs].y * 2-1;
+  //     optixLaunchParams.gBuffer[fbOfs].normal.z =
+  //     optixLaunchParams.averageBuffer[fbOfs].z * 2 -1;
+  // }
+  //
 }
 
-__device__ vec2f projectDirectionToCameraView(const vec3f& direction, const vec3f& cameraDir00, const vec3f& cameraDirDU, const vec3f& cameraDirDV) {
-    // Normalize the direction vector
-    vec3f dir = normalize(direction);
-
-    // Compute the screen space coordinates
-    float t = dot(dir, cameraDir00) / dot(cameraDir00, cameraDir00);
-    float u = dot(dir, cameraDirDU) / dot(cameraDirDU, cameraDirDU) / t;
-    float v = dot(dir, cameraDirDV) / dot(cameraDirDV, cameraDirDV) / t;
-
-    // // Adjust to screen space
-    // u += 0.5f;
-    // v += 0.5f;
-
-    return vec2f(u, v);
-
-
-    
+__device__ double Distance(float x0, float y0, float x1, float y1) {
+  float d = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+  // printf("Distance %d %d %d %d %f\n",x0,y0,x1,y1,d);
+  return sqrtf((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
 }
 
-__device__
-vec2f normalize(vec2f v) {
-    float l = sqrtf(v.x * v.x + v.y * v.y);
-    return v / l;
+__device__ vec3f ComputeSphereCenter(vec3f position, vec3f normal,
+                                     vec3f tangent, float radius) {
+  // return position;
+  vec3f center = position - radius * normal;
+  return center;
 }
 
-OPTIX_RAYGEN_PROGRAM(fitGBuffer)(){
-    const RayGenData& self = owl::getProgramData<RayGenData>();
-    const vec2i pixelId = owl::getLaunchIndex();
-    int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
-    int leftx = max(0, pixelId.x - 2);
-    int rightx = min(self.frameBufferSize.x - 1, pixelId.x + 2);
-    int upy = max(0, pixelId.y - 2);
-    int downy = min(self.frameBufferSize.y - 1, pixelId.y + 2);
+__device__ bool AlmostZero(float v) { return abs(v) < 1e-6f; }
+
+__device__ vec2f ComputeScreenSpace(vec3f position, vec3f dir_00, vec3f dir_du,
+                                    vec3f dir_dv, vec3f center,
+                                    vec2i frameBufferSize) {
+  vec3f dir = center - position;
+  dir = normalize(dir);
+  float t = dot(dir, dir_00) / dot(dir_00, dir_00);
+  float u = dot(dir, dir_du) / dot(dir_du, dir_du) / t;
+  float v = dot(dir, dir_dv) / dot(dir_dv, dir_dv) / t;
+
+  // if( AlmostZero(u) || AlmostZero(v)) {
+  //     printf("dir %f %f %f dir_00 %f %f %f dir_du %f %f %f dir_dv %f %f
+  //     %f\n",dir.x,dir.y,dir.z,dir_00.x,dir_00.y,dir_00.z,dir_du.x,dir_du.y,dir_du.z,dir_dv.x,dir_dv.y,dir_dv.z);
+  //     printf("center position %f %f %f %f %f %f %f %f
+  //     %f\n",center.x,center.y,center.z,position.x,position.y,position.z,dir.x,dir.y,dir.z);
+  // }
+
+  u += 0.5f;
+  v += 0.5f;
+
+  return vec2f(u * frameBufferSize.x, v * frameBufferSize.y);
+}
 
 
-  //  printf("Fitting pixel %d %d\n",pixelId.x,pixelId.y);
-    
-    if(optixLaunchParams.gBuffer[fbOfs].hit) {
-        optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[fbOfs];
-        return;
+
+
+OPTIX_RAYGEN_PROGRAM(fitGBuffer)() {
+  const RayGenData &self = owl::getProgramData<RayGenData>();
+  const vec2i pixelId = owl::getLaunchIndex();
+  int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
+  int leftx = max(0, pixelId.x - 2);
+  int rightx = min(self.frameBufferSize.x - 1, pixelId.x + 2);
+  int upy = max(0, pixelId.y - 2);
+  int downy = min(self.frameBufferSize.y - 1, pixelId.y + 2);
+
+
+  if (optixLaunchParams.gBuffer[fbOfs].hit) {
+    optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[fbOfs];
+    return;
+    vec3f center =
+        ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,
+                            optixLaunchParams.gBuffer[fbOfs].normal,
+                            optixLaunchParams.gBuffer[fbOfs].tangent,
+                            optixLaunchParams.gBuffer[fbOfs].radius *
+                                optixLaunchParams.radiusScale);
+    vec3f dir_00 = optixLaunchParams.camera.dir_00 +
+                   0.5f * (optixLaunchParams.camera.dir_du +
+                           optixLaunchParams.camera.dir_dv);
+    vec2f center_screen_space = ComputeScreenSpace(
+        optixLaunchParams.camera.pos, dir_00, optixLaunchParams.camera.dir_du,
+        optixLaunchParams.camera.dir_dv, center, self.frameBufferSize);
+    vec2f screen_dir_xy = vec2f(center_screen_space.x, center_screen_space.y) -
+      vec2f(pixelId.x, pixelId.y);
+    vec3f screen_dir = vec3f(screen_dir_xy.x, screen_dir_xy.y, 0.f);
+    screen_dir = normalize(screen_dir);
+    screen_dir = 0.5f * screen_dir + 0.5f;
+    writePixel(vec4f(screen_dir,1),self.frameBuffer,fbOfs);
+    return;
+
     //
-    //   vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,optixLaunchParams.gBuffer[fbOfs].normal,optixLaunchParams.gBuffer[fbOfs].tangent,optixLaunchParams.gBuffer[fbOfs].radius * optixLaunchParams.radiusScale);
-    //   vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-    //   vec2f center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
-    //
-    //
-    //     // center_screen_space.y = 2 * pixelId.y - center_screen_space.y;
-    //     vec2f screen_dir_xy = vec2f(center_screen_space.x,center_screen_space.y) - vec2f(pixelId.x,pixelId.y);
-    //   vec3f screen_dir = vec3f(screen_dir_xy.x,screen_dir_xy.y,0.f);
-    //     
-    //   screen_dir = normalize(screen_dir);
-    //
-    //     vec2f tangentInScreen = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-    //     screen_dir = vec3f(tangentInScreen.x,tangentInScreen.y,0.f);
-    //     screen_dir = normalize(screen_dir);
+    //     vec2f tangentInScreen =
+    //     projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent,
+    //     dir_00, optixLaunchParams.camera.dir_du,
+    //     optixLaunchParams.camera.dir_dv); screen_dir =
+    //     vec3f(tangentInScreen.x,tangentInScreen.y,0.f); screen_dir =
+    //     normalize(screen_dir);
     //   //  screen_dir.y *= -1;
     //    // screen_dir.y = 0.7;
-    //     
+    //
     //     screen_dir = 0.5f * screen_dir + 0.5f;
     //     writePixel(vec4f(screen_dir,1),self.frameBuffer,fbOfs);
     // //  screen_dir = 0.5f * screen_dir + 0.5f;
     //   // if(optixLaunchParams.debugMode == VisualizeNormal)
     //   //     optixLaunchParams.gBuffer->normal = screen_dir;
     //   //   // optixLaunchParams.gBuffer[fbOfs].normal = screen_dir;
-      //   // optixLaunchParams.fittedGuffer[fbOfs].normal = screen_dir;
-      //
-      // vec2f normal_dir_xy = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-      // screen_dir = vec3f(normal_dir_xy.x,normal_dir_xy.y,0.f);
-      // screen_dir = normalize(screen_dir);
-      //   //
-      //   if(optixLaunchParams.debugMode == VisualizeNormal)
-      //       screen_dir = optixLaunchParams.gBuffer[fbOfs].normal * 0.5f + 0.5f;
-      // //
-      // //  screen_dir = optixLaunchParams.gBuffer[fbOfs].normal;// * 0.5f + 0.5f;
-      // //  screen_dir = 0.5f * screen_dir + 0.5f;
-      //
-      //  // printf("Normal %f %f %f\n",screen_dir.x,screen_dir.y,screen_dir.z);
-      //
-      //   writePixel(screen_dir, optixLaunchParams.accumId,
-      //   self.frameBuffer,
-      //   optixLaunchParams.accumBuffer,
-      //   optixLaunchParams.averageBuffer,
-      //   fbOfs);
-        return;
-    }
-    // printf("Fitting pixel %d %d\n",pixelId.x,pixelId.y);
-    
-    float minDistance = 1e20f;
-    int m;
-    int n;
-
-    int mCenter;
-    int nCenter;
-    int validNeghborCount = 0;
-
-    float delta = 0;
-    for (int i = leftx; i <= rightx; i++) {
-        for (int j = upy; j <= downy; j++) {
-            if(i == pixelId.x && j == pixelId.y) {
-                continue;
-            }
-            int ofs = i + self.frameBufferSize.x * j;
-            if(!optixLaunchParams.gBuffer[ofs].hit) {
-                continue;
-            }
-            
-
-
-            vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-            vec2f tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[ofs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-            vec2f normalizedTangent = normalize(tangent);
-            vec2f normal(-normalizedTangent.y, normalizedTangent.x);
-
-            vec2f project_normal = projectDirectionToCameraView(optixLaunchParams.gBuffer[ofs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-            if(dot(normal,project_normal) < 0.f) {
-                normal = -normal;
-            }
-            float pI = i +0.5f;
-            float pJ = j + 0.5f;
-            float radius = 10.f;
-            float centerx = pI - normal.x * radius;
-            float centery = pJ - normal.y * radius;
-            
-            float pPixelX = pixelId.x + 0.5f;
-            float pPixelY = pixelId.y + 0.5f;
-            
-            delta = abs(Distance(pI,pJ,centerx,centery) - Distance(pPixelX,pPixelY,centerx,centery));
-
-            if(delta == 0) {
-                //printf("center %f %f %f %f %f %f\n",pI,pJ,centerx,centery,Distance(pI,pJ,centerx,centery),radius);
-                // printf("PI PJ Pixel Center %f %f %f %f %f %f %f %f\n",pI,pJ,pPixelX,pPixelY,centerx,centery,Distance(pI,pJ,centerx,centery),Distance(pPixelX,pPixelY,centerx,centery));
-            }
-            
-            if(delta < optixLaunchParams.fitDeltaThreshold &&  Distance(i,j,centerx,centery) < minDistance) {
-                minDistance = Distance(i,j,centerx,centery);
-                // printf("minDistance %f\n",minDistance);
-                m = i;
-                n = j;
-                mCenter = centerx;
-                nCenter = centery;
-            }
-        }
-    }
-
-    if(minDistance < 1e20f) {
-        // printf("Fitted pixel %d %d to %d %d\n",pixelId.x,pixelId.y,m,n);
-        int ofs = m + self.frameBufferSize.x * n;
-        optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
-        optixLaunchParams.gBuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
-        optixLaunchParams.fittedGuffer[fbOfs].from_it = true;
-        optixLaunchParams.gBuffer[fbOfs].from_it = true;
-
-        if(optixLaunchParams.debugMode == VisualizeBlack) {
-            writePixel(vec4f(delta/10.f),self.frameBuffer,fbOfs);
-        }
-        if(optixLaunchParams.debugMode == VisualizePosition){
-            writePixel(vec4f((mCenter)/1000.f,(nCenter)/1000.f,0.f,1.f),self.frameBuffer,fbOfs);
-        }
-        optixLaunchParams.denoiseBuffer[fbOfs] = optixLaunchParams.denoiseBuffer[ofs];
-    }
-    else {
-        optixLaunchParams.fittedGuffer[fbOfs].strand_index = -100;
-    }
-
-    {
-        
-    }
-}
-
-__device__ __host__
-
-float Distance(vec3f p0, vec3f p1) {
-    return length(p0 - p1);
-}
-__device__ __host__
-
-float Distance2(vec3f p0, vec3f p1) {
-    return dot(p0 - p1, p0 - p1);
-}
-__device__ __host__
-
-float GetFilterWeight(DenoiseGBuffer g0, DenoiseGBuffer g1,vec3f color0,vec3f color1,vec2i pixelId0,vec2i pixelId1) {
-    if(g0.strand_index != g1.strand_index && dot(g0.tangent,g1.tangent) < optixLaunchParams.tangentThreshold) {
-       // printf("Different strand %d %d\n",g0.strand_index,g1.strand_index);
-        return 0.0f;
-    }
-    float positionSigma = optixLaunchParams.positionSigma;
-    float tangentSigma = optixLaunchParams.tangentSigma;
-    float colorSigma = optixLaunchParams.colorSigma;
-
-    float distancePixel = (pixelId0.x - pixelId1.x) * (pixelId0.x - pixelId1.x) + (pixelId0.y - pixelId1.y) * (pixelId0.y - pixelId1.y);
-    
-    float distancePos = exp(-distancePixel * positionSigma);
-    float distanceTangent = exp(-Distance2(g0.tangent,g1.tangent) * tangentSigma);
-    float distanceColor = exp(-Distance2(color0,color1) * colorSigma);
-
-
-   //printf("Distance %f %f %f %f\n",distancePixel,distancePos,distanceTangent,distanceColor);
-
-    // return 1;
-    float weight = distancePos * distanceTangent * distanceColor;
-    if(weight == 1.f && pixelId0!=pixelId1){
-       printf("strand %d %d tangent %f %f %f %f %f %f distance %f %f %f %f\n",g0.strand_index,g1.strand_index,g0.tangent.x,g0.tangent.y,g0.tangent.z,g1.tangent.x,g1.tangent.y,g1.tangent.z,distancePixel,distancePos,distanceTangent,distanceColor);
-    }
-    return distancePos * distanceTangent * distanceColor;
-}
-__device__ __host__
-
-float calculateTheta(const vec2f& center, const vec2f& point) {
-    float dx = point.x - center.x;
-    float dy = point.y - center.y;
-    return std::atan2(dy, dx);
-}
-
-OPTIX_RAYGEN_PROGRAM(denoise)(){
-    const RayGenData& self = owl::getProgramData<RayGenData>();
-    const vec2i pixelId = owl::getLaunchIndex();
-    int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
-
-    if(!optixLaunchParams.gBuffer[fbOfs].hit) {
-        optixLaunchParams.denoiseBuffer[fbOfs]  = optixLaunchParams.averageBuffer[fbOfs];
-        // optixLaunchParams.denoiseBuffer[fbOfs]  = make_float4(1.f,0.f,0.f,1.f);
-        writePixel(optixLaunchParams.denoiseBuffer,self.frameBuffer,fbOfs);
-        return;
-    }
-
-    vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,optixLaunchParams.gBuffer[fbOfs].normal,optixLaunchParams.gBuffer[fbOfs].tangent,optixLaunchParams.gBuffer[fbOfs].radius * optixLaunchParams.radiusScale);
-    // vec2f ceneter_screen_space = vec2f(dot(center - optixLaunchParams.camera.pos,optixLaunchParams.camera.dir_du),dot(center - optixLaunchParams.camera.pos,optixLaunchParams.camera.dir_dv));
+    //   // optixLaunchParams.fittedGuffer[fbOfs].normal = screen_dir;
     //
-    // int centerx = int(ceneter_screen_space.x * self.frameBufferSize.x);
-    // int centery = int(ceneter_screen_space.y * self.frameBufferSize.y);
-    // vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-    // vec2f center_screen_space = ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
-    // int centerx = center_screen_space.x;
-    // int centery = center_screen_space.y;
+    // vec2f normal_dir_xy =
+    // projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal,
+    // dir_00, optixLaunchParams.camera.dir_du,
+    // optixLaunchParams.camera.dir_dv); screen_dir =
+    // vec3f(normal_dir_xy.x,normal_dir_xy.y,0.f); screen_dir =
+    // normalize(screen_dir);
+    //   //
+    //   if(optixLaunchParams.debugMode == VisualizeNormal)
+    //       screen_dir = optixLaunchParams.gBuffer[fbOfs].normal * 0.5f + 0.5f;
+    // //
+    // //  screen_dir = optixLaunchParams.gBuffer[fbOfs].normal;// * 0.5f +
+    // 0.5f;
+    // //  screen_dir = 0.5f * screen_dir + 0.5f;
+    //
+    //  // printf("Normal %f %f %f\n",screen_dir.x,screen_dir.y,screen_dir.z);
+    //
+    //   writePixel(screen_dir, optixLaunchParams.accumId,
+    //   self.frameBuffer,
+    //   optixLaunchParams.accumBuffer,
+    //   optixLaunchParams.averageBuffer,
+    //   fbOfs);
+    return;
+  }
+  // printf("Fitting pixel %d %d\n",pixelId.x,pixelId.y);
 
-   // printf("center %d %d %d %d\n",centerx,centery,pixelId.x,pixelId.y);
+  float minDistance = 1e20f;
+  int m;
+  int n;
 
-    int pi = pixelId.x;
-    int pj = pixelId.y;
+  int mCenter;
+  int nCenter;
+  int validNeghborCount = 0;
 
-    vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f * (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv);
-    vec2f tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-    vec2f normalizedTangent = normalize(tangent);
-    vec2f normal(-normalizedTangent.y, normalizedTangent.x);
-    vec2f project_normal = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].normal, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-    if(dot(normal,project_normal) < 0.f) {
+  float delta = 0;
+  for (int i = leftx; i <= rightx; i++) {
+    for (int j = upy; j <= downy; j++) {
+      if (i == pixelId.x && j == pixelId.y) {
+        continue;
+      }
+      int ofs = i + self.frameBufferSize.x * j;
+      if (!optixLaunchParams.gBuffer[ofs].hit) {
+        continue;
+      }
+
+      vec3f dir_00 = optixLaunchParams.camera.dir_00 +
+                     0.5f * (optixLaunchParams.camera.dir_du +
+                             optixLaunchParams.camera.dir_dv);
+      vec2f tangent = projectDirectionToCameraView(
+          optixLaunchParams.gBuffer[ofs].tangent, dir_00,
+          optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+      vec2f normalizedTangent = normalize(tangent);
+      vec2f normal(-normalizedTangent.y, normalizedTangent.x);
+
+      vec2f project_normal = projectDirectionToCameraView(
+          optixLaunchParams.gBuffer[ofs].normal, dir_00,
+          optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+      if (dot(normal, project_normal) < 0.f) {
         normal = -normal;
-    }
-    float pI = pi +0.5f;
-    float pJ = pj + 0.5f;
-    float radius = 0.1f * optixLaunchParams.radiusScale;
-    float centerx = pI - normal.x * radius;
-    float centery = pJ - normal.y * radius;
+      }
+      float pI = i + 0.5f;
+      float pJ = j + 0.5f;
+      float radius = 10.f;
+      float centerx = pI - normal.x * radius;
+      float centery = pJ - normal.y * radius;
 
-    
+      float pPixelX = pixelId.x + 0.5f;
+      float pPixelY = pixelId.y + 0.5f;
+
+      delta = abs(Distance(pI, pJ, centerx, centery) -
+                  Distance(pPixelX, pPixelY, centerx, centery));
+
+      if (delta == 0) {
+        // printf("center %f %f %f %f %f
+        // %f\n",pI,pJ,centerx,centery,Distance(pI,pJ,centerx,centery),radius);
+        //  printf("PI PJ Pixel Center %f %f %f %f %f %f %f
+        //  %f\n",pI,pJ,pPixelX,pPixelY,centerx,centery,Distance(pI,pJ,centerx,centery),Distance(pPixelX,pPixelY,centerx,centery));
+      }
+
+      if (delta < optixLaunchParams.fitDeltaThreshold &&
+          Distance(i, j, centerx, centery) < minDistance) {
+        minDistance = Distance(i, j, centerx, centery);
+        // printf("minDistance %f\n",minDistance);
+        m = i;
+        n = j;
+        mCenter = centerx;
+        nCenter = centery;
+      }
+    }
+  }
+
+  if (minDistance < 1e20f) {
+    // printf("Fitted pixel %d %d to %d %d\n",pixelId.x,pixelId.y,m,n);
+    int ofs = m + self.frameBufferSize.x * n;
+    optixLaunchParams.fittedGuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
+    optixLaunchParams.gBuffer[fbOfs] = optixLaunchParams.gBuffer[ofs];
+    optixLaunchParams.fittedGuffer[fbOfs].from_it = true;
+    optixLaunchParams.gBuffer[fbOfs].from_it = true;
+
+    if (optixLaunchParams.debugMode == VisualizeBlack) {
+      writePixel(vec4f(delta / 10.f), self.frameBuffer, fbOfs);
+    }
+    if (optixLaunchParams.debugMode == VisualizePosition) {
+      writePixel(vec4f((mCenter) / 1000.f, (nCenter) / 1000.f, 0.f, 1.f),
+                 self.frameBuffer, fbOfs);
+    }
+    optixLaunchParams.denoiseBuffer[fbOfs] =
+        optixLaunchParams.denoiseBuffer[ofs];
+  } else {
+    optixLaunchParams.fittedGuffer[fbOfs].strand_index = -100;
+  }
+
+  {}
+}
+
+__device__ __host__
+
+    float
+    Distance(vec3f p0, vec3f p1) {
+  return length(p0 - p1);
+}
+__device__ __host__
+
+    float
+    Distance2(vec3f p0, vec3f p1) {
+  return dot(p0 - p1, p0 - p1);
+}
+__device__ __host__
+
+    float
+    GetFilterWeight(DenoiseGBuffer g0, DenoiseGBuffer g1, vec3f color0,
+                    vec3f color1, vec2i pixelId0, vec2i pixelId1) {
+  if (g0.strand_index != g1.strand_index &&
+      dot(g0.tangent, g1.tangent) < optixLaunchParams.tangentThreshold) {
+    // printf("Different strand %d %d\n",g0.strand_index,g1.strand_index);
+    return 0.0f;
+  }
+  float positionSigma = optixLaunchParams.positionSigma;
+  float tangentSigma = optixLaunchParams.tangentSigma;
+  float colorSigma = optixLaunchParams.colorSigma;
+
+  float distancePixel = (pixelId0.x - pixelId1.x) * (pixelId0.x - pixelId1.x) +
+                        (pixelId0.y - pixelId1.y) * (pixelId0.y - pixelId1.y);
+
+  float distancePos = exp(-distancePixel * positionSigma);
+  float distanceTangent =
+      exp(-Distance2(g0.tangent, g1.tangent) * tangentSigma);
+  float distanceColor = exp(-Distance2(color0, color1) * colorSigma);
+
+  // printf("Distance %f %f %f
+  // %f\n",distancePixel,distancePos,distanceTangent,distanceColor);
+
+  // return 1;
+  float weight = distancePos * distanceTangent * distanceColor;
+  if (weight == 1.f && pixelId0 != pixelId1) {
+    printf("strand %d %d tangent %f %f %f %f %f %f distance %f %f %f %f\n",
+           g0.strand_index, g1.strand_index, g0.tangent.x, g0.tangent.y,
+           g0.tangent.z, g1.tangent.x, g1.tangent.y, g1.tangent.z,
+           distancePixel, distancePos, distanceTangent, distanceColor);
+  }
+  return distancePos * distanceTangent * distanceColor;
+}
+__device__ __host__
+
+    float
+    calculateTheta(const vec2f &center, const vec2f &point) {
+  float dx = point.x - center.x;
+  float dy = point.y - center.y;
+  return std::atan2(dy, dx);
+}
+
+OPTIX_RAYGEN_PROGRAM(denoise)() {
+  const RayGenData &self = owl::getProgramData<RayGenData>();
+  const vec2i pixelId = owl::getLaunchIndex();
+  int fbOfs = pixelId.x + self.frameBufferSize.x * pixelId.y;
+
+  if (!optixLaunchParams.gBuffer[fbOfs].hit) {
+    optixLaunchParams.denoiseBuffer[fbOfs] =
+        optixLaunchParams.averageBuffer[fbOfs];
+    // optixLaunchParams.denoiseBuffer[fbOfs]  = make_float4(1.f,0.f,0.f,1.f);
+    writePixel(optixLaunchParams.denoiseBuffer, self.frameBuffer, fbOfs);
+    return;
+  }
+
+  vec3f center = ComputeSphereCenter(optixLaunchParams.gBuffer[fbOfs].position,
+                                     optixLaunchParams.gBuffer[fbOfs].normal,
+                                     optixLaunchParams.gBuffer[fbOfs].tangent,
+                                     optixLaunchParams.gBuffer[fbOfs].radius *
+                                         optixLaunchParams.radiusScale);
+  // vec2f ceneter_screen_space = vec2f(dot(center -
+  // optixLaunchParams.camera.pos,optixLaunchParams.camera.dir_du),dot(center -
+  // optixLaunchParams.camera.pos,optixLaunchParams.camera.dir_dv));
+  //
+  // int centerx = int(ceneter_screen_space.x * self.frameBufferSize.x);
+  // int centery = int(ceneter_screen_space.y * self.frameBufferSize.y);
+  // vec3f dir_00 = optixLaunchParams.camera.dir_00 + 0.5f *
+  // (optixLaunchParams.camera.dir_du + optixLaunchParams.camera.dir_dv); vec2f
+  // center_screen_space =
+  // ComputeScreenSpace(optixLaunchParams.camera.pos,dir_00,optixLaunchParams.camera.dir_du,optixLaunchParams.camera.dir_dv,center,self.frameBufferSize);
+  // int centerx = center_screen_space.x;
+  // int centery = center_screen_space.y;
+
+  // printf("center %d %d %d %d\n",centerx,centery,pixelId.x,pixelId.y);
+
+  int pi = pixelId.x;
+  int pj = pixelId.y;
+
+  vec3f dir_00 = optixLaunchParams.camera.dir_00 +
+                 0.5f * (optixLaunchParams.camera.dir_du +
+                         optixLaunchParams.camera.dir_dv);
+  vec2f tangent = projectDirectionToCameraView(
+      optixLaunchParams.gBuffer[fbOfs].tangent, dir_00,
+      optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+  vec2f normalizedTangent = normalize(tangent);
+  vec2f normal(-normalizedTangent.y, normalizedTangent.x);
+  vec2f project_normal = projectDirectionToCameraView(
+      optixLaunchParams.gBuffer[fbOfs].normal, dir_00,
+      optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+  if (dot(normal, project_normal) < 0.f) {
+    normal = -normal;
+  }
+  float pI = pi + 0.5f;
+  float pJ = pj + 0.5f;
+  float radius = 0.1f * optixLaunchParams.radiusScale;
+  float centerx = pI - normal.x * radius;
+  float centery = pJ - normal.y * radius;
+
   // printf("center %d %d %d %d %f\n",pi,pj,centerx,centery,radius);
-    // radius = max(radius,5.f);
-    float theta = calculateTheta(vec2f(centerx,centery),vec2f(pi,pj));
+  // radius = max(radius,5.f);
+  float theta = calculateTheta(vec2f(centerx, centery), vec2f(pi, pj));
 
-    float maxTheta = optixLaunchParams.thetaRange;
-    float deltaTheta = maxTheta / 10.f;
+  float maxTheta = optixLaunchParams.thetaRange;
+  float deltaTheta = maxTheta / 10.f;
 
-    float curTheta = -maxTheta;
+  float curTheta = -maxTheta;
 
-    float totalWeight = 0.0f;
+  float totalWeight = 0.0f;
 
-    vec3f centerColor = vec3f(optixLaunchParams.denoiseBuffer[fbOfs]);
-    
-    vec3f color = vec3f(0.f,0.f,0.f);
-    int filterCount = 0;
-    float filterWeight[100];
+  vec3f centerColor = vec3f(optixLaunchParams.denoiseBuffer[fbOfs]);
 
-    int lastCurX  = 100000;
-    int lastCurY = 100000;
-    
-    while(curTheta < maxTheta) {
-        
-        float curX = centerx + radius * cos(theta + curTheta);
-        float curY = centery + radius * sin(theta + curTheta);
-        int curI = int(curX);
-        int curJ = int(curY);
+  vec3f color = vec3f(0.f, 0.f, 0.f);
+  int filterCount = 0;
+  float filterWeight[100];
 
-        if(curI == lastCurX && curJ == lastCurY) {
-            curTheta += deltaTheta;
-            lastCurX = curI;
-            lastCurY = curJ;
-            continue;
-        }
-        if(curI < 0 || curI >= self.frameBufferSize.x || curJ < 0 || curJ >= self.frameBufferSize.y) {
-            curTheta += deltaTheta;
-            continue;
-        }
-        int curOfs = curI + self.frameBufferSize.x * curJ;
+  int lastCurX = 100000;
+  int lastCurY = 100000;
 
-        if(optixLaunchParams.gBuffer[curOfs].hit == false || optixLaunchParams.fittedGuffer[curOfs].strand_index==-100) {
-            curTheta += deltaTheta;
-            continue;
-        }
-        // if(curI == pi && curJ == pj) {
-            if(optixLaunchParams.gBuffer[curOfs].from_it) {
-                curTheta += deltaTheta;
-                continue;
-            }
-        // }
-        vec3f curpixelColor = vec3f(optixLaunchParams.denoiseBuffer[curOfs]);
-        float weight = GetFilterWeight(optixLaunchParams.gBuffer[fbOfs],optixLaunchParams.gBuffer[curOfs],curpixelColor,centerColor,pixelId,vec2i(curI,curJ));
+  while (curTheta < maxTheta) {
 
-        if(!AlmostZero(weight)) {
-            weight = max(optixLaunchParams.weightThreshold,weight);
-            // printf("Weight %f\n",weight);
-        }
-        
-        totalWeight += weight;
-        color += weight * curpixelColor;
-        curTheta += deltaTheta;
-        lastCurX = curI;
-        lastCurY = curJ;
+    float curX = centerx + radius * cos(theta + curTheta);
+    float curY = centery + radius * sin(theta + curTheta);
+    int curI = int(curX);
+    int curJ = int(curY);
+
+    if (curI == lastCurX && curJ == lastCurY) {
+      curTheta += deltaTheta;
+      lastCurX = curI;
+      lastCurY = curJ;
+      continue;
     }
-    if(!AlmostZero(totalWeight))
-        color /= totalWeight;
-    else
-        color = centerColor;
-
-    if(optixLaunchParams.debugMode == VisualizeNormal) {
-        color = 0.5f * optixLaunchParams.gBuffer[fbOfs].normal + 0.5f;
-        vec2f screen_tangent = projectDirectionToCameraView(optixLaunchParams.gBuffer[fbOfs].tangent, dir_00, optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
-        screen_tangent = normalize(screen_tangent);
-        color = 0.5f * vec3f(screen_tangent.x,screen_tangent.y,0.f) + 0.5f;
-        writePixel(vec4f(color,1),self.frameBuffer,fbOfs);
-        return;
+    if (curI < 0 || curI >= self.frameBufferSize.x || curJ < 0 ||
+        curJ >= self.frameBufferSize.y) {
+      curTheta += deltaTheta;
+      continue;
     }
-    if(optixLaunchParams.debugMode == VisualizeTangent)
-        color = 0.5f * optixLaunchParams.gBuffer[fbOfs].tangent + 0.5f;
-    if(optixLaunchParams.debugMode == VisualizePosition)
-        color =  optixLaunchParams.gBuffer[fbOfs].position;
-    if(optixLaunchParams.debugMode == VisualizeBlack)
-        color = vec3f(0.f,0.f,0.f);
+    int curOfs = curI + self.frameBufferSize.x * curJ;
 
-    //printf("weight %f %f %f %f %f %f %f %f %f %f\n",filterWeight[0],filterWeight[1],filterWeight[2],filterWeight[3],filterWeight[4],filterWeight[5],filterWeight[6],filterWeight[7],filterWeight[8],filterWeight[9]);
-    //color = optixLaunchParams.gBuffer[fbOfs].normal;
-    // printf("Filter count %d\n",filterCount);
-    // optixLaunchParams.denoiseBuffer[fbOfs] = make_float4(color.x,color.y,color.z,1.0f);
-    // writePixel(optixLaunchParams.denoiseBuffer,self.frameBuffer,fbOfs);
-
-    optixLaunchParams.accumBuffer[fbOfs].x -= centerColor.x;
-    optixLaunchParams.accumBuffer[fbOfs].y -= centerColor.y;
-    optixLaunchParams.accumBuffer[fbOfs].z -= centerColor.z;
-
-    // if(!needSelect(pixelId)) {
-    //     writePixel(vec4f(0,0,0,1),self.frameBuffer,fbOfs);
-    //     return;
+    if (optixLaunchParams.gBuffer[curOfs].hit == false ||
+        optixLaunchParams.fittedGuffer[curOfs].strand_index == -100) {
+      curTheta += deltaTheta;
+      continue;
+    }
+    // if(curI == pi && curJ == pj) {
+    if (optixLaunchParams.gBuffer[curOfs].from_it) {
+      curTheta += deltaTheta;
+      continue;
+    }
     // }
-    
-    writePixel(color, optixLaunchParams.accumId,
-       self.frameBuffer,
-       optixLaunchParams.accumBuffer,
-       optixLaunchParams.averageBuffer,
-       fbOfs);
+    vec3f curpixelColor = vec3f(optixLaunchParams.denoiseBuffer[curOfs]);
+    float weight = GetFilterWeight(
+        optixLaunchParams.gBuffer[fbOfs], optixLaunchParams.gBuffer[curOfs],
+        curpixelColor, centerColor, pixelId, vec2i(curI, curJ));
+
+    if (!AlmostZero(weight)) {
+      weight = max(optixLaunchParams.weightThreshold, weight);
+      // printf("Weight %f\n",weight);
+    }
+
+    totalWeight += weight;
+    color += weight * curpixelColor;
+    curTheta += deltaTheta;
+    lastCurX = curI;
+    lastCurY = curJ;
+  }
+  if (!AlmostZero(totalWeight))
+    color /= totalWeight;
+  else
+    color = centerColor;
+
+  if (optixLaunchParams.debugMode == VisualizeNormal) {
+    color = 0.5f * optixLaunchParams.gBuffer[fbOfs].normal + 0.5f;
+    vec2f screen_tangent = projectDirectionToCameraView(
+        optixLaunchParams.gBuffer[fbOfs].tangent, dir_00,
+        optixLaunchParams.camera.dir_du, optixLaunchParams.camera.dir_dv);
+    screen_tangent = normalize(screen_tangent);
+    color = 0.5f * vec3f(screen_tangent.x, screen_tangent.y, 0.f) + 0.5f;
+    writePixel(vec4f(color, 1), self.frameBuffer, fbOfs);
+    return;
+  }
+  if (optixLaunchParams.debugMode == VisualizeTangent)
+    color = 0.5f * optixLaunchParams.gBuffer[fbOfs].tangent + 0.5f;
+  if (optixLaunchParams.debugMode == VisualizePosition)
+    color = optixLaunchParams.gBuffer[fbOfs].position;
+  if (optixLaunchParams.debugMode == VisualizeBlack)
+    color = vec3f(0.f, 0.f, 0.f);
+
+  // printf("weight %f %f %f %f %f %f %f %f %f
+  // %f\n",filterWeight[0],filterWeight[1],filterWeight[2],filterWeight[3],filterWeight[4],filterWeight[5],filterWeight[6],filterWeight[7],filterWeight[8],filterWeight[9]);
+  // color = optixLaunchParams.gBuffer[fbOfs].normal;
+  //  printf("Filter count %d\n",filterCount);
+  //  optixLaunchParams.denoiseBuffer[fbOfs] =
+  //  make_float4(color.x,color.y,color.z,1.0f);
+  //  writePixel(optixLaunchParams.denoiseBuffer,self.frameBuffer,fbOfs);
+
+  optixLaunchParams.accumBuffer[fbOfs].x -= centerColor.x;
+  optixLaunchParams.accumBuffer[fbOfs].y -= centerColor.y;
+  optixLaunchParams.accumBuffer[fbOfs].z -= centerColor.z;
+
+  // if(!needSelect(pixelId)) {
+  //     writePixel(vec4f(0,0,0,1),self.frameBuffer,fbOfs);
+  //     return;
+  // }
+
+  writePixel(color, optixLaunchParams.accumId, self.frameBuffer,
+             optixLaunchParams.accumBuffer, optixLaunchParams.averageBuffer,
+             fbOfs);
 }

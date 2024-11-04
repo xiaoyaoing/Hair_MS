@@ -599,7 +599,7 @@ OPTIX_CLOSEST_HIT_PROGRAM(hairCH)()
     si.isSurface = false;
 
     // if(si.hair.hair_strand_index < 400 || si.hair.hair_strand_index>500) {
-    //     si.hit = false;
+    //     si.hit = false;set(CMAKE_TOOLCHAIN_FILE "E:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
     //     si.isSurface = false;
     // }
 
